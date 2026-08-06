@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   AlertTriangleIcon,
@@ -18,6 +17,7 @@ import {
   MinusIcon,
   PieIcon,
   SearchIcon,
+  ShareIcon,
   ShieldCheckIcon,
   XCircleIcon,
 } from "@/app/components/icons";
@@ -78,7 +78,7 @@ function CriticalityChip({ value }: { value: ReqCriticality }) {
   );
 }
 
-export function StepResultats() {
+export function StepRapport() {
   const { data } = useWizard();
   const files = data.files.length > 0 ? data.files : DEMO_FILES;
   const stats = requirementStats();
@@ -114,6 +114,15 @@ export function StepResultats() {
     };
   }
 
+  function share() {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: "Rapport d'analyse ENTI WIN", url }).catch(() => {});
+    } else {
+      navigator.clipboard?.writeText(url);
+    }
+  }
+
   return (
     <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col px-6 py-4 xl:px-10">
       {/* ---------------- Entête ---------------- */}
@@ -146,14 +155,14 @@ export function StepResultats() {
             <DownloadIcon className="h-[18px] w-[18px]" />
             Télécharger le rapport
           </button>
-          <Link
-            href="/analyse/rapport"
-            prefetch
+          <button
+            type="button"
+            onClick={share}
             className="inline-flex h-11 items-center gap-2.5 rounded-xl bg-navy-800 px-5 text-[14.5px] font-semibold text-white transition-colors hover:bg-navy-900"
           >
-            Accéder au rapport complet
-            <ChevronRightIcon className="h-[18px] w-[18px]" />
-          </Link>
+            <ShareIcon className="h-[18px] w-[18px]" />
+            Partager le rapport
+          </button>
         </div>
       </div>
 
@@ -430,9 +439,6 @@ export function StepResultats() {
             <p className="text-[14px] font-semibold text-navy-900">
               Niveau de confiance : {selected.confidence} %
             </p>
-            <span className="rounded-md border border-brand-blue-100 bg-brand-blue-50 px-2 py-1 text-[12.5px] font-semibold text-brand-blue-600">
-              Validation humaine requise
-            </span>
           </div>
         </section>
       </div>

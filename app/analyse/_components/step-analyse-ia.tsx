@@ -79,7 +79,12 @@ export function StepAnalyseIa() {
         return <AnalysisResumed progress={progress} themes={themes} />;
 
       case "done":
-        return <AnalysisDone themes={themes} onSeeResults={() => router.push("/analyse/resultats")} />;
+        return (
+          <AnalysisDone
+            themes={themes}
+            onSeeResults={() => router.push("/analyse/rapport")}
+          />
+        );
     }
   })();
 

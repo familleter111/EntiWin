@@ -7,15 +7,13 @@ import {
   FlagTN,
 } from "@/app/components/flags";
 
-/** Les 7 étapes du tunnel d'analyse. */
+/** Les 5 étapes du tunnel d'analyse, « Rapport » étant l'étape finale. */
 export const WIZARD_STEPS = [
   { label: "Informations", href: "/analyse" },
   { label: "Documents", href: "/analyse/documents" },
   { label: "Thèmes détectés", href: "/analyse/themes" },
   { label: "Analyse IA", href: "/analyse/analyse-ia" },
-  { label: "Résultats", href: "/analyse/resultats" },
   { label: "Rapport", href: "/analyse/rapport" },
-  { label: "Suivi", href: "/analyse/suivi" },
 ] as const;
 
 export type WizardStepHref = (typeof WIZARD_STEPS)[number]["href"];

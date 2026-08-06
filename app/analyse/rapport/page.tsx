@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { StepRapport } from "../_components/step-rapport";
+import { StepRapport } from "../_components/step-rapport-final";
 
 export const metadata: Metadata = {
-  title: "Rapport & recommandations",
-  description: "Étape 6 : synthèse des constats et recommandations prioritaires.",
+  title: "Rapport d'analyse",
+  description:
+    "Étape 5 : rapport d'analyse, exigences évaluées, écarts et recommandations.",
 };
 
 export default function Page() {
