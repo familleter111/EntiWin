@@ -51,7 +51,7 @@ export type DetectedTheme = {
   files: (UploadedFile & { description: string })[];
 };
 
-const THEME_LABEL: Record<ThemeId, string> = {
+export const THEME_LABEL: Record<ThemeId, string> = {
   deviations: "Déviations et CAPA",
   documentaire: "Gestion documentaire",
 };

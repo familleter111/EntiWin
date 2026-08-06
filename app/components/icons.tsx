@@ -461,6 +461,15 @@ export function LightbulbIcon(props: IconProps) {
   );
 }
 
+export function EyeIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M2.8 12S6 6.5 12 6.5 21.2 12 21.2 12 18 17.5 12 17.5 2.8 12 2.8 12Z" />
+      <circle cx="12" cy="12" r="2.6" />
+    </svg>
+  );
+}
+
 export function MinusIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>

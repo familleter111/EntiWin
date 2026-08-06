@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CheckIcon } from "@/app/components/icons";
+import { CheckIcon, SparkleIcon } from "@/app/components/icons";
 import { WIZARD_STEPS } from "../_lib/wizard";
 import { useWizard } from "./wizard-store";
 
@@ -32,6 +32,8 @@ export function Stepper() {
           const done = i < current || (i === current && analysisDone);
           const active = i === current && !analysisDone;
           const blue = i === current && onAnalysis;
+          // Dernière étape : pastille « IA » tant qu'elle n'est pas atteinte.
+          const isAi = step.href === "/analyse/recommandations";
 
           const label = (
             <>
@@ -69,10 +71,18 @@ export function Stepper() {
                         ? "border-brand-blue-500 bg-brand-blue-500 text-white"
                         : active
                           ? "border-navy-800 bg-navy-800 text-white"
-                          : "border-line bg-white text-ink-300"
+                          : isAi
+                        ? "border-brand-blue-100 bg-brand-blue-50 text-brand-blue-500"
+                        : "border-line bg-white text-ink-300"
                   }`}
                 >
-                  {done ? <CheckIcon className="h-4 w-4" strokeWidth={2.6} /> : i + 1}
+                  {done ? (
+                    <CheckIcon className="h-4 w-4" strokeWidth={2.6} />
+                  ) : isAi && !active ? (
+                    <SparkleIcon className="h-4 w-4" />
+                  ) : (
+                    i + 1
+                  )}
                 </span>
 
                 {/* trait droit */}

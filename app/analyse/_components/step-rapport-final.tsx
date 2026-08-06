@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   AlertTriangleIcon,
   ArrowDownIcon,
+  ArrowRightIcon,
   ArrowUpIcon,
   CheckCircleIcon,
   CheckCircleSolidIcon,
@@ -11,17 +13,21 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ClipboardCheckIcon,
+  ClockIcon,
   DownloadIcon,
   FileTypeIcon,
+  InfoIcon,
   LightbulbIcon,
   MinusIcon,
   PieIcon,
   SearchIcon,
   ShareIcon,
   ShieldCheckIcon,
+  SparkleIcon,
   XCircleIcon,
 } from "@/app/components/icons";
 import { DEMO_FILES } from "../_lib/documents";
+import { complianceScore } from "../_lib/recommendations";
 import {
   CRITICALITIES,
   REQUIREMENTS,
@@ -34,16 +40,16 @@ import { useWizard } from "./wizard-store";
 
 const PAGE_SIZE = 10;
 
-/** Pastilles de statut — vert couvert, orange partiel, rouge non identifié. */
+/** Pastilles de statut — vert couvert, bleu partiel, rouge non identifié. */
 const STATUS_STYLE: Record<ReqStatus, string> = {
   couverte: "border-green-100 bg-green-50 text-green-600",
-  partielle: "border-warn/30 bg-warn/10 text-warn",
+  partielle: "border-brand-blue-100 bg-brand-blue-50 text-brand-blue-600",
   "non-identifiee": "border-danger/25 bg-danger/5 text-danger",
 };
 
 const CRITICALITY_STYLE: Record<ReqCriticality, string> = {
   Élevée: "border-danger/25 bg-danger/5 text-danger",
-  Moyenne: "border-warn/30 bg-warn/10 text-warn",
+  Moyenne: "border-brand-blue-100 bg-brand-blue-50 text-brand-blue-600",
   Faible: "border-line bg-surface text-ink-500",
 };
 
@@ -66,7 +72,12 @@ function StatusChip({ status }: { status: ReqStatus }) {
 }
 
 function CriticalityChip({ value }: { value: ReqCriticality }) {
-  const Icon = value === "Élevée" ? ArrowUpIcon : MinusIcon;
+  const Icon =
+    value === "Élevée"
+      ? ArrowUpIcon
+      : value === "Moyenne"
+        ? ClockIcon
+        : MinusIcon;
 
   return (
     <span
@@ -82,6 +93,7 @@ export function StepRapport() {
   const { data } = useWizard();
   const files = data.files.length > 0 ? data.files : DEMO_FILES;
   const stats = requirementStats();
+  const score = complianceScore();
 
   const [query, setQuery] = useState("");
   const [criticality, setCriticality] = useState<ReqCriticality | "">("");
@@ -124,7 +136,7 @@ export function StepRapport() {
   }
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col px-6 py-4 xl:px-10">
+    <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col px-6 py-4 xl:px-10 lg:h-full">
       {/* ---------------- Entête ---------------- */}
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-0">
@@ -167,7 +179,10 @@ export function StepRapport() {
       </div>
 
       {/* ---------------- Indicateurs ---------------- */}
-      <ul className="mt-3 grid divide-line rounded-2xl border border-line bg-white sm:grid-cols-3 lg:grid-cols-5 lg:divide-x">
+      <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,380px)_1fr]">
+        <ScoreCard score={score} />
+
+        <ul className="grid divide-line rounded-2xl border border-line bg-white sm:grid-cols-3 lg:grid-cols-5 lg:divide-x">
         <StatTile
           icon={<ClipboardCheckIcon className="h-6 w-6" />}
           tone="navy"
@@ -182,7 +197,7 @@ export function StepRapport() {
         />
         <StatTile
           icon={<PieIcon className="h-6 w-6" />}
-          tone="warn"
+          tone="blue"
           value={stats.partielles}
           label="Partielles"
         />
@@ -194,14 +209,17 @@ export function StepRapport() {
         />
         <StatTile
           icon={<AlertTriangleIcon className="h-6 w-6" />}
-          tone="warn"
+          tone="blue"
           value={stats.critiques}
           label="Points critiques"
         />
-      </ul>
+        </ul>
+      </div>
 
       {/* ---------------- Tableau + détail ---------------- */}
-      <div className="mt-3 grid min-h-0 flex-1 gap-4 lg:grid-cols-[1fr_minmax(0,420px)]">
+      {/* grid-rows figées : les deux cartes prennent la hauteur disponible
+          au lieu de pousser la page vers le bas */}
+      <div className="mt-3 grid min-h-0 flex-1 gap-4 lg:grid-cols-[1fr_minmax(0,420px)] lg:grid-rows-[minmax(0,1fr)]">
         {/* ----- Résultats par exigence ----- */}
         <section className="flex min-h-0 flex-col rounded-2xl border border-line bg-white p-4">
           <h2 className="font-display text-[17px] font-bold text-navy-900">
@@ -440,6 +458,16 @@ export function StepRapport() {
               Niveau de confiance : {selected.confidence} %
             </p>
           </div>
+
+          <Link
+            href="/analyse/recommandations"
+            prefetch
+            className="mt-3 inline-flex h-12 items-center justify-center gap-2.5 rounded-xl bg-navy-800 px-5 text-[15px] font-semibold text-white transition-colors hover:bg-navy-900"
+          >
+            <SparkleIcon className="h-5 w-5" />
+            Voir les recommandations IA
+            <ArrowRightIcon className="ml-auto h-5 w-5" />
+          </Link>
         </section>
       </div>
     </div>
@@ -448,6 +476,57 @@ export function StepRapport() {
 
 /* ------------------------------------------------------------------ */
 
+/** Score de conformité : couverture pondérée des exigences. */
+function ScoreCard({ score }: { score: number }) {
+  const circumference = 2 * Math.PI * 44;
+
+  return (
+    <section className="flex items-center gap-4 rounded-2xl border border-line bg-white p-4">
+      <div className="relative h-[104px] w-[104px] shrink-0">
+        <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
+          <circle
+            cx="50"
+            cy="50"
+            r="44"
+            fill="none"
+            stroke="var(--color-line)"
+            strokeWidth="9"
+          />
+          <circle
+            cx="50"
+            cy="50"
+            r="44"
+            fill="none"
+            stroke="var(--color-green-500)"
+            strokeWidth="9"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference * (1 - score / 100)}
+          />
+        </svg>
+        <span className="absolute inset-0 flex items-center justify-center font-display text-[22px] font-extrabold text-green-500">
+          {score} %
+        </span>
+      </div>
+
+      <div className="min-w-0">
+        <p className="font-display text-[17px] font-bold text-navy-900">
+          Score de conformité
+        </p>
+        <p className="mt-0.5 text-[13.5px] leading-5 text-ink-500">
+          Couverture pondérée
+          <br />
+          des exigences
+        </p>
+        <p className="mt-2 flex items-start gap-1.5 text-[12px] leading-4 text-ink-500">
+          <InfoIcon className="mt-px h-3.5 w-3.5 shrink-0" />
+          Couvert = 100 % • Partiel = 50 % • Non identifié = 0 %
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function StatTile({
   icon,
   tone,
@@ -455,14 +534,14 @@ function StatTile({
   label,
 }: {
   icon: React.ReactNode;
-  tone: "navy" | "green" | "warn" | "danger";
+  tone: "navy" | "green" | "blue" | "danger";
   value: number;
   label: string;
 }) {
   const styles = {
     navy: "bg-navy-50 text-navy-800",
     green: "bg-green-50 text-green-500",
-    warn: "bg-warn/10 text-warn",
+    blue: "bg-brand-blue-50 text-brand-blue-500",
     danger: "bg-danger/10 text-danger",
   } as const;
 

@@ -39,6 +39,9 @@ export type WizardData = {
   extraFiles: UploadedFile[];
   /** Horodatage de fin d'analyse (0 tant qu'elle n'est pas terminée). */
   completedAt: number;
+  // Recommandations IA (étape 6)
+  planItems: string[];
+  finalized: boolean;
 };
 
 const EMPTY: WizardData = {
@@ -61,6 +64,8 @@ const EMPTY: WizardData = {
   answerFiles: {},
   extraFiles: [],
   completedAt: 0,
+  planItems: [],
+  finalized: false,
 };
 
 const STORAGE_KEY = "entiwin.wizard";
