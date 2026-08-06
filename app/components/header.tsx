@@ -1,12 +1,7 @@
 import Link from "next/link";
+import { HeaderCta } from "./header-cta";
 import { NavLinks } from "./nav-links";
-import {
-  ChevronDownIcon,
-  GlobeIcon,
-  Logo,
-  MenuIcon,
-  RocketIcon,
-} from "./icons";
+import { ChevronDownIcon, GlobeIcon, Logo, MenuIcon } from "./icons";
 
 /**
  * `site`  : en-tête de la vitrine (maquette page d'accueil)
@@ -66,14 +61,7 @@ export function Header({ variant = "site" }: { variant?: "site" | "app" }) {
             </ul>
           </details>
 
-          <Link
-            href="/analyse"
-            prefetch
-            className="btn-primary hidden sm:inline-flex"
-          >
-            {isApp && <RocketIcon className="h-[18px] w-[18px]" />}
-            Lancer mon analyse
-          </Link>
+          <HeaderCta className="btn-primary hidden sm:inline-flex" />
 
           {/* Menu mobile : également en HTML pur */}
           <details className="relative lg:hidden">
@@ -82,13 +70,7 @@ export function Header({ variant = "site" }: { variant?: "site" | "app" }) {
             </summary>
             <div className="absolute right-0 mt-2 w-56 rounded-xl border border-line bg-white p-2 shadow-lg shadow-navy-900/5">
               <NavLinks className="flex flex-col gap-3 px-3 py-2" />
-              <Link
-                href="/analyse"
-                prefetch
-                className="btn-primary mt-2 w-full text-sm"
-              >
-                Lancer mon analyse
-              </Link>
+              <HeaderCta className="btn-primary mt-2 w-full text-sm" />
             </div>
           </details>
         </div>
