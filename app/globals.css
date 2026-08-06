@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+@theme {
+  /* Bleu marine ENTI WIN (titres, boutons, logo) */
+  --color-navy-50: #eef3fb;
+  --color-navy-100: #dbe5f5;
+  --color-navy-200: #b9c8e4;
+  --color-navy-500: #1e3a73;
+  --color-navy-700: #143166;
+  --color-navy-800: #122c5e;
+  --color-navy-900: #0d2a5c;
+
+  /* Vert d'accent (badge, icônes, soulignement) */
+  --color-green-50: #e9f7ef;
+  --color-green-100: #cfeedd;
+  --color-green-300: #7fd3a4;
+  --color-green-400: #34b36a;
+  --color-green-500: #12a150;
+  --color-green-600: #0e8a45;
+  --color-green-700: #0b6e37;
+
+  /* Bleu clair (icône IA) */
+  --color-brand-blue-50: #e8f0fe;
+  --color-brand-blue-100: #d3e2fd;
+  --color-brand-blue-500: #1a63e8;
+  --color-brand-blue-600: #1557d0;
+
+  /* Neutres */
+  --color-ink-900: #0d2a5c;
+  --color-ink-700: #1f2d4a;
+  --color-ink-500: #46557a;
+  --color-ink-300: #98a3ba;
+  --color-line: #e6eaf2;
+  --color-surface: #f7f9fc;
+
+  /* Statuts (repris de la maquette) */
+  --color-danger: #e5484d;
+  --color-ok: #12a150;
+  --color-warn: #f0a020;
+  --color-ko: #dc2626;
+
+  /* Une seule famille, comme la maquette : Inter partout */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: #ffffff;
+    color: var(--color-ink-700);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-navy-100);
+    color: var(--color-navy-900);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-navy-800);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn,
+  .btn-primary,
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5
+      text-[15px] font-semibold transition-colors duration-150;
+  }
+
+  .btn-primary {
+    @apply bg-navy-800 text-white hover:bg-navy-900;
+  }
+
+  .btn-ghost {
+    @apply border border-line bg-white text-navy-900 hover:border-navy-200 hover:bg-navy-50;
+  }
+
+  .card {
+    @apply rounded-2xl border border-line bg-white p-6;
+  }
+}
+
+/**
+ * Tunnel d'analyse : chaque étape doit tenir dans un écran.
+ * Sur les fenêtres basses, on réduit l'échelle du contenu (équivalent d'un
+ * zoom navigateur à 90 %) plutôt que de rogner le bas de page.
+ */
+@media (min-width: 1024px) and (max-height: 900px) {
+  .wizard-scale {
+    zoom: 0.95;
+  }
+}
+@media (min-width: 1024px) and (max-height: 820px) {
+  .wizard-scale {
+    zoom: 0.9;
+  }
+}
+@media (min-width: 1024px) and (max-height: 740px) {
+  .wizard-scale {
+    zoom: 0.85;
+  }
+}
+@media (min-width: 1024px) and (max-height: 670px) {
+  .wizard-scale {
+    zoom: 0.78;
+  }
+}
+@media (min-width: 1024px) and (max-height: 600px) {
+  .wizard-scale {
+    zoom: 0.7;
+  }
+}
+@media (min-width: 1024px) and (max-height: 540px) {
+  .wizard-scale {
+    zoom: 0.62;
+  }
+}
+
+/* Le contenu ne dépend d'aucune animation JS : tout est rendu côté serveur. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
