@@ -14,20 +14,20 @@ const steps = [
   {
     icon: CloudUploadIcon,
     tone: "green",
-    title: "1. Importez votre document",
-    text: "Déposez vos documents qualité (PDF, Word, etc.). Sécurisé et confidentiel.",
+    title: "1. Déposez vos documents",
+    text: "Procédures, déviations, CAPA : PDF ou Word. Vos fichiers restent confidentiels.",
   },
   {
     icon: BrainIcon,
     tone: "blue",
-    title: "2. L'IA analyse les exigences",
-    text: "Notre IA compare votre document à la grille d'exigences sélectionnée et détecte les écarts.",
+    title: "2. L'IA confronte les exigences",
+    text: "Chaque exigence du référentiel est vérifiée dans vos documents, passage à l'appui.",
   },
   {
     icon: TrendingUpIcon,
     tone: "green",
-    title: "3. Consultez vos écarts et recommandations",
-    text: "Accédez à une synthèse claire, justifiée et exploitable. Passez à l'action rapidement.",
+    title: "3. Décidez, preuves à l'appui",
+    text: "Écarts, preuves et plan d'action priorisé : un rapport que vos experts n'ont plus qu'à valider.",
   },
 ] as const;
 
@@ -37,8 +37,8 @@ const toneClass = {
 } as const;
 
 const highlights = [
-  { icon: BrainIcon, label: "Analyse assistée par IA" },
-  { icon: ShieldCheckIcon, label: "Résultats traçables" },
+  { icon: BrainIcon, label: "Résultat en minutes" },
+  { icon: ShieldCheckIcon, label: "Chaque écart sourcé" },
   { icon: UserCheckIcon, label: "Validation humaine" },
 ];
 
@@ -52,18 +52,18 @@ export default function Home() {
           <p className="inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-[13px] font-semibold text-green-600 ring-1 ring-green-100 xl:text-sm">
             <SparkleIcon className="h-4 w-4 text-green-500" />
             <span className="font-bold text-navy-900">ENTI WIN</span> —
-            AI-Assisted Pharmaceutical Quality Assessment
+            Évaluation qualité pharmaceutique assistée par IA
           </p>
 
           <h1 className="mt-4 font-display text-[clamp(2rem,3.4vw,3.5rem)] font-extrabold leading-[1.1] tracking-[-0.02em] text-navy-900">
-            Évaluez vos documents
-            <br className="hidden lg:block" /> qualité avec l&apos;IA
+            Détectez vos écarts
+            <br className="hidden lg:block" /> avant l&apos;inspection
           </h1>
 
-          <p className="mt-4 max-w-[46ch] text-[clamp(1rem,1.1vw,1.1rem)] leading-[1.6] text-ink-500">
-            Identifiez en quelques minutes les exigences couvertes,
-            <br className="hidden lg:block" /> les écarts et les points à
-            améliorer.
+          <p className="mt-4 max-w-[48ch] text-[clamp(1rem,1.1vw,1.1rem)] leading-[1.6] text-ink-500">
+            L&apos;IA confronte vos procédures, déviations et CAPA aux
+            <br className="hidden lg:block" /> exigences BPF : chaque écart est
+            justifié et traçable.
           </p>
 
           <div className="mt-6 flex flex-col gap-3.5 sm:flex-row">

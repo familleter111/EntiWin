@@ -24,8 +24,8 @@ export function Header({ variant = "site" }: { variant?: "site" | "app" }) {
             {isApp ? "ENTI WIN" : "ENTI WiN"}
           </span>
           {isApp && (
-            <span className="ml-1 hidden max-w-[190px] text-[10.5px] font-semibold uppercase leading-tight tracking-[0.06em] text-ink-300 xl:block">
-              AI-Assisted Pharmaceutical Quality Assessment
+            <span className="ml-1 hidden max-w-[250px] text-[10.5px] font-semibold uppercase leading-tight tracking-[0.06em] text-ink-300 xl:block">
+              Évaluation qualité pharmaceutique assistée par IA
             </span>
           )}
         </Link>
