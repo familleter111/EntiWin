@@ -92,74 +92,147 @@
  * Tunnel d'analyse : chaque étape doit tenir dans un écran, sans barre de
  * défilement — ni sur la page, ni à l'intérieur des cartes.
  *
- * L'étape la plus dense (le rapport : 10 lignes d'exigences + panneau de
- * détail) a besoin de 980 px de hauteur utile — mesuré, pas estimé. L'échelle
- * suit donc le ratio hauteur/980, par paliers de 40 px ; au-delà de 980 px de
- * fenêtre, rien n'est réduit.
+ * L'étape la plus dense (le rapport : 10 lignes d'exigences, panneau de détail
+ * et bandeau de recommandations) a besoin de 1120 px de hauteur utile —
+ * mesuré, pas estimé. Chaque palier vaut donc (palier − 40) / 1120, pour que
+ * même la plus petite fenêtre de la tranche tienne encore.
  */
-@media (min-width: 1024px) and (max-height: 980px) {
+@media (min-width: 1024px) and (max-height: 1120px) {
   .wizard-scale {
     zoom: 0.96;
   }
 }
-@media (min-width: 1024px) and (max-height: 940px) {
+@media (min-width: 1024px) and (max-height: 1080px) {
   .wizard-scale {
-    zoom: 0.91;
+    zoom: 0.92;
   }
 }
-@media (min-width: 1024px) and (max-height: 900px) {
+@media (min-width: 1024px) and (max-height: 1040px) {
   .wizard-scale {
-    zoom: 0.87;
+    zoom: 0.89;
   }
 }
-@media (min-width: 1024px) and (max-height: 860px) {
+@media (min-width: 1024px) and (max-height: 1000px) {
   .wizard-scale {
-    zoom: 0.83;
+    zoom: 0.85;
   }
 }
-@media (min-width: 1024px) and (max-height: 820px) {
+@media (min-width: 1024px) and (max-height: 960px) {
   .wizard-scale {
-    zoom: 0.79;
+    zoom: 0.82;
   }
 }
-@media (min-width: 1024px) and (max-height: 780px) {
+@media (min-width: 1024px) and (max-height: 920px) {
+  .wizard-scale {
+    zoom: 0.78;
+  }
+}
+@media (min-width: 1024px) and (max-height: 880px) {
   .wizard-scale {
     zoom: 0.75;
   }
 }
-@media (min-width: 1024px) and (max-height: 740px) {
+@media (min-width: 1024px) and (max-height: 840px) {
   .wizard-scale {
     zoom: 0.71;
   }
 }
-@media (min-width: 1024px) and (max-height: 700px) {
+@media (min-width: 1024px) and (max-height: 800px) {
   .wizard-scale {
     zoom: 0.67;
   }
 }
-@media (min-width: 1024px) and (max-height: 660px) {
+@media (min-width: 1024px) and (max-height: 760px) {
   .wizard-scale {
-    zoom: 0.63;
+    zoom: 0.64;
   }
 }
-@media (min-width: 1024px) and (max-height: 620px) {
+@media (min-width: 1024px) and (max-height: 720px) {
   .wizard-scale {
-    zoom: 0.59;
+    zoom: 0.6;
   }
 }
-@media (min-width: 1024px) and (max-height: 580px) {
+@media (min-width: 1024px) and (max-height: 680px) {
   .wizard-scale {
-    zoom: 0.55;
+    zoom: 0.57;
   }
 }
-@media (min-width: 1024px) and (max-height: 540px) {
+@media (min-width: 1024px) and (max-height: 640px) {
   .wizard-scale {
-    zoom: 0.51;
+    zoom: 0.53;
   }
 }
-@media (min-width: 1024px) and (max-height: 500px) {
+@media (min-width: 1024px) and (max-height: 600px) {
   .wizard-scale {
-    zoom: 0.47;
+    zoom: 0.5;
+  }
+}
+@media (min-width: 1024px) and (max-height: 560px) {
+  .wizard-scale {
+    zoom: 0.46;
+  }
+}
+@media (min-width: 1024px) and (max-height: 520px) {
+  .wizard-scale {
+    zoom: 0.42;
+  }
+}
+
+/**
+ * Document imprimable (/rapport) : des feuilles A4 réelles, pour que l'aperçu
+ * à l'écran et le PDF téléchargé soient rigoureusement identiques.
+ * Hauteur figée (et non min-height) : une feuille trop haute d'un pixel
+ * ajouterait une page blanche à l'impression.
+ */
+.sheet {
+  display: flex;
+  width: 210mm;
+  height: 297mm;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+  padding: 14mm 14mm 10mm;
+}
+
+@media screen {
+  .sheet {
+    border-radius: 6px;
+    box-shadow: 0 12px 40px rgb(13 42 92 / 0.13);
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  /* Barre d'outils de l'aperçu : jamais imprimée. */
+  .no-print {
+    display: none !important;
+  }
+
+  .sheet {
+    border-radius: 0;
+    box-shadow: none;
+    break-after: page;
+  }
+
+  .sheet:last-of-type {
+    break-after: auto;
+  }
+
+  /* Sans cela, les aplats (en-tête du tableau, pastilles) sortent en blanc. */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 

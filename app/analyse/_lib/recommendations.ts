@@ -66,6 +66,14 @@ export const RECOMMENDATIONS: Recommendation[] = REQUIREMENTS.filter(
   }))
   .sort((a, b) => ORDER.indexOf(a.priority) - ORDER.indexOf(b.priority));
 
+/**
+ * Actions mises en avant dans le rapport et dans le PDF. Les plus critiques
+ * d'abord, puisque RECOMMENDATIONS est déjà triée par priorité.
+ */
+export function topRecommendations(count = 3) {
+  return RECOMMENDATIONS.slice(0, count);
+}
+
 export function priorityCounts() {
   return ORDER.map((priority) => ({
     priority,

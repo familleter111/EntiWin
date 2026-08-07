@@ -5,20 +5,16 @@ import { useMemo, useState } from "react";
 import {
   AlertTriangleIcon,
   ArrowDownIcon,
-  ArrowRightIcon,
-  ArrowUpIcon,
   CheckCircleIcon,
   CheckCircleSolidIcon,
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ClipboardCheckIcon,
-  ClockIcon,
-  DownloadIcon,
+  FileTextIcon,
   FileTypeIcon,
   InfoIcon,
   LightbulbIcon,
-  MinusIcon,
   PieIcon,
   SearchIcon,
   ShareIcon,
@@ -27,7 +23,12 @@ import {
   XCircleIcon,
 } from "@/app/components/icons";
 import { DEMO_FILES } from "../_lib/documents";
-import { complianceScore } from "../_lib/recommendations";
+import {
+  PRIORITY_LABEL,
+  complianceScore,
+  topRecommendations,
+  type Priority,
+} from "../_lib/recommendations";
 import {
   CRITICALITIES,
   REQUIREMENTS,
@@ -36,58 +37,16 @@ import {
   type ReqCriticality,
   type ReqStatus,
 } from "../_lib/requirements";
+import { CriticalityChip, StatusChip } from "./requirement-chips";
 import { useWizard } from "./wizard-store";
 
 const PAGE_SIZE = 10;
 
-/** Pastilles de statut — vert couvert, bleu partiel, rouge non identifié. */
-const STATUS_STYLE: Record<ReqStatus, string> = {
-  couverte: "border-green-100 bg-green-50 text-green-600",
-  partielle: "border-brand-blue-100 bg-brand-blue-50 text-brand-blue-600",
-  "non-identifiee": "border-danger/25 bg-danger/5 text-danger",
+const PRIORITY_STYLE: Record<Priority, string> = {
+  elevee: "bg-danger/10 text-danger",
+  ameliorer: "bg-brand-blue-50 text-brand-blue-600",
+  surveiller: "bg-surface text-ink-500",
 };
-
-const CRITICALITY_STYLE: Record<ReqCriticality, string> = {
-  Élevée: "border-danger/25 bg-danger/5 text-danger",
-  Moyenne: "border-brand-blue-100 bg-brand-blue-50 text-brand-blue-600",
-  Faible: "border-line bg-surface text-ink-500",
-};
-
-function StatusChip({ status }: { status: ReqStatus }) {
-  const Icon =
-    status === "couverte"
-      ? CheckCircleIcon
-      : status === "partielle"
-        ? PieIcon
-        : XCircleIcon;
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border px-2 py-0.5 text-[12.5px] font-semibold ${STATUS_STYLE[status]}`}
-    >
-      <Icon className="h-3.5 w-3.5 shrink-0" />
-      {STATUS_LABEL[status]}
-    </span>
-  );
-}
-
-function CriticalityChip({ value }: { value: ReqCriticality }) {
-  const Icon =
-    value === "Élevée"
-      ? ArrowUpIcon
-      : value === "Moyenne"
-        ? ClockIcon
-        : MinusIcon;
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border px-2 py-0.5 text-[12.5px] font-semibold ${CRITICALITY_STYLE[value]}`}
-    >
-      <Icon className="h-3.5 w-3.5 shrink-0" />
-      {value}
-    </span>
-  );
-}
 
 export function StepRapport() {
   const { data } = useWizard();
@@ -159,14 +118,14 @@ export function StepRapport() {
         </div>
 
         <div className="ml-auto flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="inline-flex h-11 items-center gap-2.5 rounded-xl border border-line bg-white px-5 text-[14.5px] font-semibold text-navy-900 transition-colors hover:border-navy-200 hover:bg-navy-50"
+          <Link
+            href="/rapport"
+            prefetch
+            className="inline-flex h-11 items-center gap-2.5 rounded-xl bg-brand-blue-500 px-5 text-[14.5px] font-semibold text-white transition-colors hover:bg-brand-blue-600"
           >
-            <DownloadIcon className="h-[18px] w-[18px]" />
-            Télécharger le rapport
-          </button>
+            <FileTextIcon className="h-[18px] w-[18px]" />
+            Générer le rapport PDF
+          </Link>
           <button
             type="button"
             onClick={share}
@@ -458,18 +417,45 @@ export function StepRapport() {
               Niveau de confiance : {selected.confidence} %
             </p>
           </div>
-
-          <Link
-            href="/analyse/recommandations"
-            prefetch
-            className="mt-3 inline-flex h-12 items-center justify-center gap-2.5 rounded-xl bg-navy-800 px-5 text-[15px] font-semibold text-white transition-colors hover:bg-navy-900"
-          >
-            <SparkleIcon className="h-5 w-5" />
-            Voir les recommandations IA
-            <ArrowRightIcon className="ml-auto h-5 w-5" />
-          </Link>
         </section>
       </div>
+
+      {/* ---------------- Recommandations IA prioritaires ---------------- */}
+      <section className="mt-3 shrink-0 rounded-2xl border border-line bg-white p-3">
+        <div className="flex flex-wrap items-baseline gap-x-3">
+          <h2 className="font-display text-[16px] font-bold text-navy-900">
+            Recommandations IA prioritaires
+          </h2>
+          <p className="text-[12.5px] text-ink-500">
+            Actions proposées à partir des écarts identifiés dans
+            l&apos;analyse.
+          </p>
+        </div>
+
+        <ul className="mt-2 grid gap-2.5 lg:grid-cols-3">
+          {topRecommendations().map((reco) => (
+            <li
+              key={reco.id}
+              className="rounded-xl border border-line bg-white p-2.5"
+            >
+              <p className="flex items-start gap-2 font-display text-[13.5px] font-bold leading-[1.3] text-navy-900">
+                <SparkleIcon className="mt-px h-[17px] w-[17px] shrink-0 text-brand-blue-500" />
+                {reco.title}
+              </p>
+              <div className="mt-1.5 flex items-start gap-2.5">
+                <span
+                  className={`shrink-0 whitespace-nowrap rounded-md px-2 py-0.5 text-[11.5px] font-semibold ${PRIORITY_STYLE[reco.priority]}`}
+                >
+                  {PRIORITY_LABEL[reco.priority]}
+                </span>
+                <p className="text-[12.5px] leading-[1.4] text-ink-500">
+                  {reco.detail}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }
