@@ -101,6 +101,15 @@ export function ChevronDownIcon(props: IconProps) {
   );
 }
 
+export function TagIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M11.6 3.5H4.8A1.3 1.3 0 0 0 3.5 4.8v6.8c0 .35.14.68.38.92l7.6 7.6a1.3 1.3 0 0 0 1.84 0l6.8-6.8a1.3 1.3 0 0 0 0-1.84l-7.6-7.6a1.3 1.3 0 0 0-.92-.38Z" />
+      <circle cx="8" cy="8" r="1.3" />
+    </svg>
+  );
+}
+
 export function ChevronUpIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>

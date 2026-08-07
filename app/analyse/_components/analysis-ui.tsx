@@ -122,24 +122,6 @@ export const StatusDone = (
   </>
 );
 
-export function StatusRunning({ label }: { label: string }) {
-  return (
-    <span className="flex items-center gap-2 text-brand-blue-500">
-      <DottedCircleIcon className="h-[18px] w-[18px] animate-spin [animation-duration:2.5s]" />
-      {label}
-    </span>
-  );
-}
-
-export function StatusWaiting({ label }: { label: string }) {
-  return (
-    <span className="flex items-center gap-2 text-ink-500">
-      <ClockIcon className="h-[18px] w-[18px]" />
-      {label}
-    </span>
-  );
-}
-
 export type Stage = {
   icon: Icon;
   label: string;

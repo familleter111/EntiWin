@@ -12,16 +12,14 @@ import {
   DottedCircleIcon,
   FileTextIcon,
   PuzzleIcon,
-  SearchIcon,
   SparkleIcon,
 } from "@/app/components/icons";
 import { COMPLEMENTS, complementsByTheme } from "../_lib/complements";
 import { DEMO_FILES, detectThemes } from "../_lib/documents";
+import { AnalysisLive } from "./analysis-live";
 import {
   ProgressRing,
   StageBar,
-  StatusRunning,
-  StatusWaiting,
   ThemeIcon,
   ThemeStatusRow,
   type Stage,
@@ -29,10 +27,14 @@ import {
 import { ComplementQuestions, ComplementReview } from "./complements";
 import { useWizard } from "./wizard-store";
 
-/** Progression simulée : l'analyse s'arrête à 68 %, puis reprend jusqu'à 100 %. */
+/**
+ * Progression simulée : l'analyse s'arrête à 68 %, le temps des questions
+ * complémentaires, puis reprend jusqu'à 100 %. Les durées sont calées pour
+ * que le journal d'activité reste lisible pendant le défilement.
+ */
 const PAUSE_AT = 68;
-const RUN_MS = 7000;
-const RESUME_MS = 6000;
+const RUN_MS = 11000;
+const RESUME_MS = 8000;
 
 export function StepAnalyseIa() {
   const router = useRouter();
@@ -48,11 +50,13 @@ export function StepAnalyseIa() {
     switch (phase) {
       case "running":
         return (
-          <AnalysisRunning
+          <AnalysisLive
             progress={progress}
             themes={themes}
+            fileCount={files.length}
+            running
             title="Analyse IA en cours"
-            subtitle="ENTI WIN analyse les documents selon les thèmes détectés."
+            subtitle="L'IA analyse vos documents pour identifier les preuves et détecter les écarts."
           />
         );
 
@@ -76,7 +80,16 @@ export function StepAnalyseIa() {
         );
 
       case "resuming":
-        return <AnalysisResumed progress={progress} themes={themes} />;
+        return (
+          <AnalysisLive
+            progress={progress}
+            themes={themes}
+            fileCount={files.length + data.extraFiles.length}
+            running
+            title="Analyse IA reprise"
+            subtitle="Vos compléments ont été intégrés : l'IA termine l'analyse des exigences restantes."
+          />
+        );
 
       case "done":
         return (
@@ -131,83 +144,6 @@ function useProgress(
   if (phase === "done") return 100;
   // borné à la plage de la phase courante (cas d'un retour en arrière)
   return Math.min(Math.max(value, from), to);
-}
-
-/* ------------------------------------------------------------------ */
-/* 4a — Analyse en cours                                               */
-/* ------------------------------------------------------------------ */
-
-function AnalysisRunning({
-  progress,
-  themes,
-  title,
-  subtitle,
-}: {
-  progress: number;
-  themes: ReturnType<typeof detectThemes>;
-  title: string;
-  subtitle: string;
-}) {
-  const stages: Stage[] = [
-    {
-      icon: FileTextIcon,
-      label: "Lecture des documents",
-      state: progress > 20 ? "done" : "current",
-    },
-    {
-      icon: ClipboardCheckIcon,
-      label: "Identification des exigences",
-      state: progress > 45 ? "done" : progress > 20 ? "current" : "todo",
-    },
-    {
-      icon: SearchIcon,
-      label: "Recherche des preuves",
-      state: progress > 45 ? "current" : "todo",
-    },
-    { icon: BarsIcon, label: "Synthèse des écarts", state: "todo" },
-  ];
-
-  return (
-    <>
-      <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-        {title}
-      </h1>
-      <p className="mt-1 text-[14px] text-ink-500">{subtitle}</p>
-
-      <section className="mt-4 grid items-center gap-6 rounded-2xl border border-line bg-white p-5 lg:grid-cols-[280px_1fr]">
-        <ProgressRing value={progress} label="Analyse des preuves documentaires" />
-        <ul className="grid gap-3 lg:border-l lg:border-line lg:pl-8">
-          {themes.map((theme, i) => (
-            <ThemeStatusRow
-              key={theme.id}
-              theme={theme}
-              left={
-                <>
-                  <CheckCircleSolidIcon className="h-[18px] w-[18px] text-green-500" />
-                  Documents reçus
-                </>
-              }
-              right={
-                i === 0 || progress > 50 ? (
-                  <StatusRunning label="Analyse en cours" />
-                ) : (
-                  <StatusWaiting label="En attente" />
-                )
-              }
-            />
-          ))}
-        </ul>
-      </section>
-
-      <div className="mt-4">
-        <StageBar stages={stages} />
-      </div>
-
-      <p className="mt-4 text-center text-[14px] text-ink-500 lg:mt-auto lg:pt-4">
-        L&apos;analyse se poursuit automatiquement.
-      </p>
-    </>
-  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -324,88 +260,6 @@ function ComplementsNeeded({
             Voir les documents analysés
           </Link>
         </div>
-      </div>
-    </>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* 4e — Analyse reprise                                                */
-/* ------------------------------------------------------------------ */
-
-function AnalysisResumed({
-  progress,
-  themes,
-}: {
-  progress: number;
-  themes: ReturnType<typeof detectThemes>;
-}) {
-  const { update } = useWizard();
-
-  const stages: Stage[] = [
-    { icon: FileTextIcon, label: "Lecture des documents", state: "done" },
-    {
-      icon: ClipboardCheckIcon,
-      label: "Questions complémentaires",
-      state: "done",
-    },
-    {
-      icon: SearchIcon,
-      label: "Analyse des nouvelles preuves",
-      state: "current",
-    },
-    { icon: BarsIcon, label: "Synthèse des écarts", state: "todo" },
-  ];
-
-  return (
-    <>
-      <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-        Analyse IA reprise
-      </h1>
-      <p className="mt-1 text-[14px] text-ink-500">
-        Les compléments ont été intégrés. ENTI WIN poursuit l&apos;analyse.
-      </p>
-
-      <section className="mt-4 grid items-center gap-6 rounded-2xl border border-line bg-white p-5 lg:grid-cols-[280px_1fr]">
-        <ProgressRing value={progress} label="Analyse des nouvelles informations" />
-        <ul className="grid gap-3 lg:border-l lg:border-line lg:pl-8">
-          {themes.map((theme, i) => (
-            <ThemeStatusRow
-              key={theme.id}
-              theme={theme}
-              left={
-                <>
-                  <CheckCircleSolidIcon className="h-[18px] w-[18px] text-green-500" />
-                  Compléments reçus
-                </>
-              }
-              right={
-                i === 0 ? (
-                  <StatusRunning label="Analyse en cours" />
-                ) : (
-                  <StatusWaiting label="À suivre" />
-                )
-              }
-            />
-          ))}
-        </ul>
-      </section>
-
-      <div className="mt-4">
-        <StageBar stages={stages} />
-      </div>
-
-      <div className="mt-4 flex flex-col items-center gap-2.5 lg:mt-auto lg:pt-4">
-        <p className="text-[14px] text-ink-500">
-          Aucune action n&apos;est requise pour le moment.
-        </p>
-        <button
-          type="button"
-          onClick={() => update({ analysisPhase: "review" })}
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-brand-blue-500 bg-white px-6 text-[14.5px] font-semibold text-brand-blue-500 transition-colors hover:bg-brand-blue-50"
-        >
-          Voir mes réponses
-        </button>
       </div>
     </>
   );
