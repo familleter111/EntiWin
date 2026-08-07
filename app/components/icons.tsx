@@ -101,6 +101,14 @@ export function ChevronDownIcon(props: IconProps) {
   );
 }
 
+export function ChevronUpIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="m6.5 14.5 5.5-5 5.5 5" />
+    </svg>
+  );
+}
+
 export function TrendingUpIcon(props: IconProps) {
   return (
     <svg {...base} {...props}>

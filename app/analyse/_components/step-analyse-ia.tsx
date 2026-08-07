@@ -316,7 +316,7 @@ function ComplementsNeeded({
             <ChevronRightIcon className="h-5 w-5" />
           </button>
           <Link
-            href="/analyse/documents"
+            href="/analyse"
             prefetch
             className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl border border-brand-blue-500 bg-white px-6 text-[15px] font-semibold text-brand-blue-500 transition-colors hover:bg-brand-blue-50"
           >

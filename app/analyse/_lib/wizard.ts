@@ -7,10 +7,12 @@ import {
   FlagTN,
 } from "@/app/components/flags";
 
-/** Les 5 étapes du tunnel d'analyse — le rapport est l'étape finale. */
+/**
+ * Les 4 étapes du tunnel. L'identité du demandeur n'est plus une étape : elle
+ * est demandée au moment de générer le rapport complet.
+ */
 export const WIZARD_STEPS = [
-  { label: "Informations", href: "/analyse" },
-  { label: "Documents", href: "/analyse/documents" },
+  { label: "Documents", href: "/analyse" },
   { label: "Thèmes détectés", href: "/analyse/themes" },
   { label: "Analyse IA", href: "/analyse/analyse-ia" },
   { label: "Rapport", href: "/analyse/rapport" },

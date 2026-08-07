@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 import type { UploadedFile } from "../_lib/documents";
-import type { CountryCode, Sector } from "../_lib/wizard";
+import type { CountryCode } from "../_lib/wizard";
 
 /** Sous-états de l'étape 4 (l'URL reste /analyse/analyse-ia). */
 export type AnalysisPhase =
@@ -16,51 +16,46 @@ export type AnalysisPhase =
 export type Answer = "oui" | "non" | "nsp";
 
 export type WizardData = {
-  // Informations générales
-  lastName: string;
-  firstName: string;
-  email: string;
-  role: string;
-  countryCode: CountryCode;
-  phone: string;
-  // Organisation
+  // Étape 1 — organisation puis documents
   organisation: string;
-  companyConfirmed: boolean;
-  rne: string;
-  sector: Sector | "";
-  subSectors: string[];
-  subSectorsAuto: boolean;
-  // Documents (étape 2)
+  organisationConfirmed: boolean;
   files: UploadedFile[];
-  // Analyse IA (étape 4)
+  // Étape 3 — analyse IA
   analysisPhase: AnalysisPhase;
   answers: Record<string, Answer>;
   answerFiles: Record<string, string>;
   extraFiles: UploadedFile[];
   /** Horodatage de fin d'analyse (0 tant qu'elle n'est pas terminée). */
   completedAt: number;
+  // Étape 4 — identité demandée pour débloquer le rapport complet
+  lastName: string;
+  firstName: string;
+  email: string;
+  role: string;
+  countryCode: CountryCode;
+  phone: string;
+  /** Rapport complet débloqué (le formulaire d'accès a été validé). */
+  reportGenerated: boolean;
+  generatedAt: number;
 };
 
 const EMPTY: WizardData = {
-  lastName: "",
-  firstName: "",
-  email: "",
-  role: "",
-  countryCode: "TN",
-  phone: "",
-  organisation: "Laboratoire Démo Tunisie",
-  companyConfirmed: false,
-  rne: "",
-  // Seul secteur ouvert pour le moment : les autres sont grisés dans le formulaire.
-  sector: "Pharmaceutique",
-  subSectors: [],
-  subSectorsAuto: false,
+  organisation: "",
+  organisationConfirmed: false,
   files: [],
   analysisPhase: "running",
   answers: {},
   answerFiles: {},
   extraFiles: [],
   completedAt: 0,
+  lastName: "",
+  firstName: "",
+  email: "",
+  role: "",
+  countryCode: "TN",
+  phone: "",
+  reportGenerated: false,
+  generatedAt: 0,
 };
 
 const STORAGE_KEY = "entiwin.wizard";

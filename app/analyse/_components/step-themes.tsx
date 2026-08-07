@@ -103,7 +103,7 @@ export function StepThemes() {
 
       <div className="mt-4 flex flex-col justify-center gap-4 sm:flex-row">
         <Link
-          href="/analyse/documents"
+          href="/analyse"
           prefetch
           className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl border border-navy-800 bg-white px-6 text-[15px] font-semibold text-navy-900 transition-colors hover:bg-navy-50"
         >

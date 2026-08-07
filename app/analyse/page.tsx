@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { StepInformations } from "./_components/step-informations";
+import { StepPreparation } from "./_components/step-preparation";
 
 export const metadata: Metadata = {
-  title: "Vos informations",
+  title: "Préparez votre analyse",
   description:
-    "Étape 1 du tunnel d'analyse ENTI WIN : identification du répondant et de son organisation.",
+    "Étape 1 : renseignez votre organisation puis chargez vos documents qualité.",
 };
 
-export default function AnalyseInformationsPage() {
-  return <StepInformations />;
+export default function AnalysePage() {
+  return <StepPreparation />;
 }

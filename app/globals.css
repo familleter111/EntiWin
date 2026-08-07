@@ -92,89 +92,100 @@
  * Tunnel d'analyse : chaque étape doit tenir dans un écran, sans barre de
  * défilement — ni sur la page, ni à l'intérieur des cartes.
  *
- * L'étape la plus dense (le rapport : 10 lignes d'exigences, panneau de détail
- * et bandeau de recommandations) a besoin de 1120 px de hauteur utile —
- * mesuré, pas estimé. Chaque palier vaut donc (palier − 40) / 1120, pour que
- * même la plus petite fenêtre de la tranche tienne encore.
+ * L'étape la plus dense (le rapport complet : synthèse par thème, 10 lignes
+ * d'exigences, panneau de preuves et bandeau de recommandations) a besoin de
+ * 1180 px de hauteur utile — mesuré, pas estimé. Chaque palier vaut
+ * (palier − 40) / 1180, pour que même la plus petite fenêtre de la
+ * tranche tienne encore.
  */
-@media (min-width: 1024px) and (max-height: 1120px) {
+@media (min-width: 1024px) and (max-height: 1180px) {
   .wizard-scale {
     zoom: 0.96;
   }
 }
-@media (min-width: 1024px) and (max-height: 1080px) {
+@media (min-width: 1024px) and (max-height: 1140px) {
   .wizard-scale {
-    zoom: 0.92;
+    zoom: 0.93;
   }
 }
-@media (min-width: 1024px) and (max-height: 1040px) {
+@media (min-width: 1024px) and (max-height: 1100px) {
   .wizard-scale {
     zoom: 0.89;
   }
 }
-@media (min-width: 1024px) and (max-height: 1000px) {
+@media (min-width: 1024px) and (max-height: 1060px) {
   .wizard-scale {
-    zoom: 0.85;
+    zoom: 0.86;
   }
 }
-@media (min-width: 1024px) and (max-height: 960px) {
+@media (min-width: 1024px) and (max-height: 1020px) {
   .wizard-scale {
-    zoom: 0.82;
+    zoom: 0.83;
   }
 }
-@media (min-width: 1024px) and (max-height: 920px) {
+@media (min-width: 1024px) and (max-height: 980px) {
   .wizard-scale {
-    zoom: 0.78;
+    zoom: 0.79;
   }
 }
-@media (min-width: 1024px) and (max-height: 880px) {
+@media (min-width: 1024px) and (max-height: 940px) {
   .wizard-scale {
-    zoom: 0.75;
+    zoom: 0.76;
   }
 }
-@media (min-width: 1024px) and (max-height: 840px) {
+@media (min-width: 1024px) and (max-height: 900px) {
   .wizard-scale {
-    zoom: 0.71;
+    zoom: 0.72;
   }
 }
-@media (min-width: 1024px) and (max-height: 800px) {
+@media (min-width: 1024px) and (max-height: 860px) {
   .wizard-scale {
-    zoom: 0.67;
+    zoom: 0.69;
   }
 }
-@media (min-width: 1024px) and (max-height: 760px) {
+@media (min-width: 1024px) and (max-height: 820px) {
   .wizard-scale {
-    zoom: 0.64;
+    zoom: 0.66;
   }
 }
-@media (min-width: 1024px) and (max-height: 720px) {
+@media (min-width: 1024px) and (max-height: 780px) {
   .wizard-scale {
-    zoom: 0.6;
+    zoom: 0.62;
   }
 }
-@media (min-width: 1024px) and (max-height: 680px) {
+@media (min-width: 1024px) and (max-height: 740px) {
   .wizard-scale {
-    zoom: 0.57;
+    zoom: 0.59;
   }
 }
-@media (min-width: 1024px) and (max-height: 640px) {
+@media (min-width: 1024px) and (max-height: 700px) {
   .wizard-scale {
-    zoom: 0.53;
+    zoom: 0.55;
   }
 }
-@media (min-width: 1024px) and (max-height: 600px) {
+@media (min-width: 1024px) and (max-height: 660px) {
   .wizard-scale {
-    zoom: 0.5;
+    zoom: 0.52;
   }
 }
-@media (min-width: 1024px) and (max-height: 560px) {
+@media (min-width: 1024px) and (max-height: 620px) {
   .wizard-scale {
-    zoom: 0.46;
+    zoom: 0.49;
   }
 }
-@media (min-width: 1024px) and (max-height: 520px) {
+@media (min-width: 1024px) and (max-height: 580px) {
+  .wizard-scale {
+    zoom: 0.45;
+  }
+}
+@media (min-width: 1024px) and (max-height: 540px) {
   .wizard-scale {
     zoom: 0.42;
+  }
+}
+@media (min-width: 1024px) and (max-height: 500px) {
+  .wizard-scale {
+    zoom: 0.38;
   }
 }
 

@@ -392,14 +392,49 @@ export const NO_MISSING = OK;
 
 export const CRITICALITIES: ReqCriticality[] = ["Élevée", "Moyenne", "Faible"];
 
-/** Compteurs affichés dans la barre d'indicateurs. */
-export function requirementStats() {
+/** Poids d'une exigence dans le score : couverte 100 %, partielle 50 %. */
+export const COVERAGE: Record<ReqStatus, number> = {
+  couverte: 100,
+  partielle: 50,
+  "non-identifiee": 0,
+};
+
+export type Stats = {
+  total: number;
+  couvertes: number;
+  partielles: number;
+  nonIdentifiees: number;
+  critiques: number;
+  /** Couverture pondérée, en %. */
+  score: number;
+};
+
+function statsOf(list: Requirement[]): Stats {
+  const couvertes = list.filter((r) => r.status === "couverte").length;
+  const partielles = list.filter((r) => r.status === "partielle").length;
+
   return {
-    total: REQUIREMENTS.length,
-    couvertes: REQUIREMENTS.filter((r) => r.status === "couverte").length,
-    partielles: REQUIREMENTS.filter((r) => r.status === "partielle").length,
-    nonIdentifiees: REQUIREMENTS.filter((r) => r.status === "non-identifiee")
-      .length,
-    critiques: REQUIREMENTS.filter((r) => r.criticality === "Élevée").length,
+    total: list.length,
+    couvertes,
+    partielles,
+    nonIdentifiees: list.filter((r) => r.status === "non-identifiee").length,
+    critiques: list.filter((r) => r.criticality === "Élevée").length,
+    score: list.length
+      ? Math.round(((couvertes + partielles * 0.5) / list.length) * 100)
+      : 0,
   };
+}
+
+/** Compteurs affichés dans la barre d'indicateurs. */
+export function requirementStats(): Stats {
+  return statsOf(REQUIREMENTS);
+}
+
+/** Mêmes compteurs, restreints à un thème (cartes « Scores par thème »). */
+export function themeStats(theme: ThemeId): Stats {
+  return statsOf(REQUIREMENTS.filter((r) => r.theme === theme));
+}
+
+export function requirementsOf(theme: ThemeId) {
+  return REQUIREMENTS.filter((r) => r.theme === theme);
 }
