@@ -360,6 +360,8 @@ function Counter({
 
 function LiveRing({ value, running }: { value: number; running: boolean }) {
   const circumference = 2 * Math.PI * 44;
+  // Analyse bouclée : l'anneau passe au vert, comme partout ailleurs.
+  const finished = value >= 100;
 
   return (
     <div className="relative h-[164px] w-[164px]">
@@ -369,7 +371,9 @@ function LiveRing({ value, running }: { value: number; running: boolean }) {
           cy="50"
           r="44"
           fill="none"
-          stroke="var(--color-brand-blue-50)"
+          stroke={
+            finished ? "var(--color-green-50)" : "var(--color-brand-blue-50)"
+          }
           strokeWidth="9"
         />
         <circle
@@ -377,7 +381,11 @@ function LiveRing({ value, running }: { value: number; running: boolean }) {
           cy="50"
           r="44"
           fill="none"
-          stroke="var(--color-brand-blue-500)"
+          stroke={
+            finished
+              ? "var(--color-green-500)"
+              : "var(--color-brand-blue-500)"
+          }
           strokeWidth="9"
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -385,7 +393,11 @@ function LiveRing({ value, running }: { value: number; running: boolean }) {
           className="transition-[stroke-dashoffset] duration-200"
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center font-display text-[34px] font-extrabold text-brand-blue-500">
+      <span
+        className={`absolute inset-0 flex items-center justify-center font-display text-[34px] font-extrabold ${
+          finished ? "text-green-500" : "text-brand-blue-500"
+        }`}
+      >
         {value} %
       </span>
       {running && (

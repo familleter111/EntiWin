@@ -5,25 +5,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   ArrowRightIcon,
-  BarsIcon,
-  CheckCircleSolidIcon,
   ChevronRightIcon,
   ClipboardCheckIcon,
   DottedCircleIcon,
   FileTextIcon,
-  PuzzleIcon,
   SparkleIcon,
 } from "@/app/components/icons";
 import { COMPLEMENTS, complementsByTheme } from "../_lib/complements";
 import { DEMO_FILES, detectThemes } from "../_lib/documents";
 import { AnalysisLive } from "./analysis-live";
-import {
-  ProgressRing,
-  StageBar,
-  ThemeIcon,
-  ThemeStatusRow,
-  type Stage,
-} from "./analysis-ui";
+import { ProgressRing, StageBar, ThemeIcon, type Stage } from "./analysis-ui";
 import { ComplementQuestions, ComplementReview } from "./complements";
 import { useWizard } from "./wizard-store";
 
@@ -95,6 +86,7 @@ export function StepAnalyseIa() {
         return (
           <AnalysisDone
             themes={themes}
+            fileCount={files.length + data.extraFiles.length}
             onSeeResults={() => router.push("/analyse/rapport")}
           />
         );
@@ -271,62 +263,39 @@ function ComplementsNeeded({
 
 function AnalysisDone({
   themes,
+  fileCount,
   onSeeResults,
 }: {
   themes: ReturnType<typeof detectThemes>;
+  fileCount: number;
   onSeeResults: () => void;
 }) {
-  const stages: Stage[] = [
-    { icon: FileTextIcon, label: "Documents analysés", state: "done" },
-    { icon: ClipboardCheckIcon, label: "Thèmes identifiés", state: "done" },
-    { icon: PuzzleIcon, label: "Compléments intégrés", state: "done" },
-    { icon: BarsIcon, label: "Synthèse finalisée", state: "done" },
-  ];
-
   return (
     <>
-      <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-        Analyse terminée
-      </h1>
-      <p className="mt-1 text-[14px] text-ink-500">
-        Les documents et vos compléments ont été pris en compte.
-      </p>
+      {/* Le tableau de bord reste affiché, figé à 100 % : on voit ce qui a
+          été analysé, et la sortie se trouve juste en dessous. */}
+      <AnalysisLive
+        progress={100}
+        themes={themes}
+        fileCount={fileCount}
+        running={false}
+        title="Analyse terminée"
+        subtitle="Les documents et vos compléments ont été pris en compte."
+      />
 
-      <section className="mt-4 grid items-center gap-6 rounded-2xl border border-line bg-white p-5 lg:grid-cols-[280px_1fr]">
-        <ProgressRing value={100} label="Analyse des preuves documentaires" done />
-        <ul className="grid gap-3 lg:border-l lg:border-line lg:pl-8">
-          {themes.map((theme) => (
-            <ThemeStatusRow
-              key={theme.id}
-              theme={theme}
-              left={
-                <>
-                  <CheckCircleSolidIcon className="h-[18px] w-[18px] text-green-500" />
-                  Analysé
-                </>
-              }
-            />
-          ))}
-        </ul>
-      </section>
-
-      <div className="mt-4">
-        <StageBar stages={stages} />
-      </div>
-
-      <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-brand-blue-100 bg-brand-blue-50/40 px-6 py-5 lg:mt-auto">
-        <h2 className="font-display text-2xl font-extrabold text-navy-900">
+      <section className="mt-3 flex shrink-0 flex-col items-center gap-3.5 rounded-2xl border border-brand-blue-100 bg-brand-blue-50/50 px-6 py-6">
+        <h2 className="font-display text-[clamp(1.6rem,2.2vw,2.1rem)] font-extrabold tracking-[-0.02em] text-navy-900">
           Votre analyse est prête
         </h2>
         <button
           type="button"
           onClick={onSeeResults}
-          className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl bg-navy-800 px-7 text-[15px] font-semibold text-white transition-colors hover:bg-navy-900"
+          className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-navy-800 px-9 text-[17px] font-semibold text-white transition-colors hover:bg-navy-900"
         >
           Voir les résultats
-          <ArrowRightIcon className="h-5 w-5" />
+          <ArrowRightIcon className="h-[22px] w-[22px]" />
         </button>
-      </div>
+      </section>
     </>
   );
 }
