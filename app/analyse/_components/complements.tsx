@@ -114,15 +114,20 @@ export function ComplementQuestions({
                 })}
               </div>
 
-              <div className="grid gap-2">
+              {/* min-w-0 en cascade : sans lui, un nom de fichier long impose
+                  sa largeur min-content et fait deborder la colonne. */}
+              <div className="grid min-w-0 gap-2">
                 <FilePicker
                   label="Ajouter un fichier (optionnel)"
                   onPick={(name) => attach(complement.id, name)}
                 />
                 {data.answerFiles[complement.id] && (
-                  <span className="flex items-center gap-2.5 rounded-lg border border-line bg-white px-3 py-2 text-[13.5px] text-navy-900">
+                  <span className="flex min-w-0 items-center gap-2.5 rounded-lg border border-line bg-white px-3 py-2 text-[13.5px] text-navy-900">
                     <FileTextIcon className="h-[18px] w-[18px] shrink-0 text-ink-500" />
-                    <span className="min-w-0 flex-1 truncate">
+                    <span
+                      className="min-w-0 flex-1 truncate"
+                      title={data.answerFiles[complement.id]}
+                    >
                       {data.answerFiles[complement.id]}
                     </span>
                     <CheckCircleSolidIcon className="h-[18px] w-[18px] shrink-0 text-green-500" />
@@ -221,12 +226,12 @@ export function ComplementReview({
                 )}
 
                 <span
-                  className={`flex items-center gap-2.5 text-[14px] ${
+                  className={`flex min-w-0 items-center gap-2.5 text-[14px] ${
                     file ? "text-navy-900" : "text-ink-300"
                   }`}
                 >
                   <FileTextIcon className="h-[18px] w-[18px] shrink-0" />
-                  <span className="min-w-0 truncate">
+                  <span className="min-w-0 truncate" title={file}>
                     {file ?? "Aucun fichier"}
                   </span>
                 </span>
@@ -252,7 +257,7 @@ export function ComplementReview({
           </h2>
           <p className="text-[13.5px] text-ink-500">PDF, DOCX, XLSX</p>
         </div>
-        <div className="ml-auto grid gap-2">
+        <div className="ml-auto grid min-w-0 max-w-full gap-2">
           <FilePicker
             label="Ajouter un fichier"
             onPick={(name, size) => addExtra(name, size)}
@@ -260,10 +265,12 @@ export function ComplementReview({
           {data.extraFiles.map((file) => (
             <span
               key={file.name}
-              className="flex items-center gap-2.5 rounded-lg border border-line px-3 py-2 text-[13.5px] text-navy-900"
+              className="flex min-w-0 items-center gap-2.5 rounded-lg border border-line px-3 py-2 text-[13.5px] text-navy-900"
             >
               <FileTextIcon className="h-[18px] w-[18px] shrink-0 text-ink-500" />
-              <span className="min-w-0 flex-1 truncate">{file.name}</span>
+              <span className="min-w-0 flex-1 truncate" title={file.name}>
+                {file.name}
+              </span>
               <CheckCircleSolidIcon className="h-[18px] w-[18px] shrink-0 text-green-500" />
             </span>
           ))}
