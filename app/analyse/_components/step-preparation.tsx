@@ -41,7 +41,10 @@ export function StepPreparation() {
   }
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-[1100px] flex-1 flex-col px-6 py-4 xl:px-10">
+    // « safe center » : tant que le contenu est court, il se pose au milieu de
+    // l'écran plutôt que de flotter en haut d'un grand vide ; s'il dépasse, le
+    // centrage s'annule au lieu de rogner le haut.
+    <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col px-6 py-4 lg:[justify-content:safe_center] xl:px-10">
       <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
         Préparez votre analyse
       </h1>

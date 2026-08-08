@@ -33,6 +33,7 @@ import {
   type ReqStatus,
   type Stats,
 } from "../_lib/requirements";
+import { Density } from "./density";
 import { ReportAccessDialog } from "./report-access-dialog";
 import { useWizard } from "./wizard-store";
 
@@ -97,7 +98,9 @@ function ReportOverview({ onGenerate }: { onGenerate: () => void }) {
   const stats = requirementStats();
 
   return (
-    <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col px-6 py-4 xl:px-10">
+    // « safe center » et non « center » : si le contenu dépasse, le centrage
+    // s'annule au lieu de rogner le haut de l'écran.
+    <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col px-6 py-4 lg:[justify-content:safe_center] xl:px-10">
       <div className="flex flex-wrap items-center gap-4">
         <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
           Rapport d&apos;analyse
@@ -226,6 +229,9 @@ function FullReport() {
 
   return (
     <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col px-6 py-3 xl:px-10">
+      {/* Seul écran assez dense pour mériter une réduction agressive. */}
+      <Density value="dense" />
+
       {/* ---------------- Entête ---------------- */}
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-0">
