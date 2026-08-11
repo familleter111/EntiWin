@@ -9,6 +9,8 @@
   --color-navy-700: #143166;
   --color-navy-800: #122c5e;
   --color-navy-900: #0d2a5c;
+  /* Fond du pied de page : le marine du logo poussé jusqu'au presque-noir */
+  --color-navy-950: #061530;
 
   /* Vert d'accent (badge, icônes, soulignement) */
   --color-green-50: #e9f7ef;
@@ -54,6 +56,13 @@
     color: var(--color-ink-700);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Inter n'a pas de glyphes arabes : sans cette bascule, la version arabe
+     tomberait sur la police système, différente d'une machine à l'autre. */
+  html[lang="ar"] body {
+    font-family: var(--font-arabic), var(--font-inter), ui-sans-serif,
+      system-ui, sans-serif;
   }
 
   ::selection {

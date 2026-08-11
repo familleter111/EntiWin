@@ -609,6 +609,48 @@ export function FileTypeIcon({
   );
 }
 
+export function MapPinIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 21c4.3-4.4 6.5-7.8 6.5-10.5a6.5 6.5 0 1 0-13 0C5.5 13.2 7.7 16.6 12 21Z" />
+      <circle cx="12" cy="10.3" r="2.4" />
+    </svg>
+  );
+}
+
+export function PhoneIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M6.2 3.8h3l1.5 3.7-2 1.4a11 11 0 0 0 5.4 5.4l1.4-2 3.7 1.5v3a1.7 1.7 0 0 1-1.9 1.7C10.6 18 6 13.4 4.5 5.7A1.7 1.7 0 0 1 6.2 3.8Z" />
+    </svg>
+  );
+}
+
+export function MailIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="3.5" y="5.5" width="17" height="13" rx="2.2" />
+      <path d="m4.5 7 7.5 5.5L19.5 7" />
+    </svg>
+  );
+}
+
+/**
+ * Marque LinkedIn : glyphe plein (et non des traits comme les icônes
+ * ci-dessus), c'est la seule forme officiellement reconnaissable.
+ */
+export function LinkedinIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M6.9 20.5H3.6V9.4h3.3v11.1ZM5.2 7.9a1.9 1.9 0 1 1 0-3.8 1.9 1.9 0 0 1 0 3.8Zm15.3 12.6h-3.3v-5.4c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9v5.5H9.9V9.4h3.2V11a3.5 3.5 0 0 1 3.2-1.8c3.4 0 4.1 2.2 4.1 5.1v6.2Z" />
+    </svg>
+  );
+}
+
+/**
+ * `currentColor` sur le contour : le même composant sert sur fond blanc
+ * (en-tête, rapport) et sur le fond sombre du pied de page.
+ */
 export function Logo(props: IconProps) {
   return (
     <svg
@@ -619,7 +661,7 @@ export function Logo(props: IconProps) {
     >
       <path
         d="M20 3.5c9.1 0 16.5 6.9 16.5 15.4S29.1 34.3 20 34.3c-1.9 0-3.7-.3-5.4-.8l-8 3 2.3-6.4C5.4 27.3 3.5 23.3 3.5 18.9 3.5 10.4 10.9 3.5 20 3.5Z"
-        stroke="var(--color-navy-900)"
+        stroke="currentColor"
         strokeWidth="3"
       />
       <circle cx="20" cy="18.9" r="6" fill="var(--color-green-500)" />
