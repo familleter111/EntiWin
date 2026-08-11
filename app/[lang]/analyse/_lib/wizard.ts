@@ -10,23 +10,26 @@ import {
 /**
  * Les 4 étapes du tunnel. L'identité du demandeur n'est plus une étape : elle
  * est demandée au moment de générer le rapport complet.
+ * Les libellés sont traduits (`tunnel.stepper.steps`, même index) ; seuls les
+ * chemins, canoniques, vivent ici.
  */
 export const WIZARD_STEPS = [
-  { label: "Documents", href: "/analyse" },
-  { label: "Thèmes détectés", href: "/analyse/themes" },
-  { label: "Analyse IA", href: "/analyse/analyse-ia" },
-  { label: "Rapport", href: "/analyse/rapport" },
+  { href: "/analyse" },
+  { href: "/analyse/themes" },
+  { href: "/analyse/analyse-ia" },
+  { href: "/analyse/rapport" },
 ] as const;
 
 export type WizardStepHref = (typeof WIZARD_STEPS)[number]["href"];
 
+/** Noms traduits dans `tunnel.countries`, même clé `code`. */
 export const COUNTRIES = [
-  { code: "TN", name: "Tunisie", dial: "+216", Flag: FlagTN },
-  { code: "FR", name: "France", dial: "+33", Flag: FlagFR },
-  { code: "MA", name: "Maroc", dial: "+212", Flag: FlagMA },
-  { code: "DZ", name: "Algérie", dial: "+213", Flag: FlagDZ },
-  { code: "BE", name: "Belgique", dial: "+32", Flag: FlagBE },
-  { code: "CH", name: "Suisse", dial: "+41", Flag: FlagCH },
+  { code: "TN", dial: "+216", Flag: FlagTN },
+  { code: "FR", dial: "+33", Flag: FlagFR },
+  { code: "MA", dial: "+212", Flag: FlagMA },
+  { code: "DZ", dial: "+213", Flag: FlagDZ },
+  { code: "BE", dial: "+32", Flag: FlagBE },
+  { code: "CH", dial: "+41", Flag: FlagCH },
 ] as const;
 
 export type CountryCode = (typeof COUNTRIES)[number]["code"];

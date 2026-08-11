@@ -151,6 +151,300 @@ export const fr = {
     ],
     tryPrompt: "Envie de tester sur un de vos documents ?",
   },
+
+  tunnel: {
+    stepper: {
+      ariaLabel: "Progression de l'analyse",
+      steps: ["Documents", "Thèmes détectés", "Analyse IA", "Rapport"],
+    },
+
+    countries: {
+      TN: "Tunisie",
+      FR: "France",
+      MA: "Maroc",
+      DZ: "Algérie",
+      BE: "Belgique",
+      CH: "Suisse",
+    },
+
+    preparation: {
+      title: "Préparez votre analyse",
+      subtitle:
+        "Suivez les étapes pour générer votre rapport réglementaire assisté par IA.",
+      org: {
+        title: "Organisation",
+        hint: "Indiquez le nom de votre organisation pour commencer.",
+        label: "Nom de l'organisation",
+        placeholder: "Nom de votre organisation",
+        continue: "Continuer",
+        confirmedLabel: "Organisation renseignée",
+        edit: "Modifier",
+      },
+      docsClosed: {
+        title: "Chargez vos documents",
+        hint: "Cette section s'ouvrira après validation de l'organisation.",
+      },
+      docs: {
+        title: "Chargez vos documents",
+        examples:
+          "Exemples de documents : procédure de gestion des déviations, procédure CAPA, formulaire ou modèle de déviation, procédure de Change Control, SOP approuvée, rapport d'audit, réclamation qualité, rapport APR/PQR…",
+        dropzoneTitle: "Déposez vos fichiers ici",
+        dropzoneHint: "ou cliquez pour parcourir vos fichiers",
+        formats: "PDF, DOCX, XLSX",
+        selectButton: "Sélectionner des fichiers",
+        ready: "Prêt",
+        removeAria: "Retirer {name}",
+        noFiles: "Aucun fichier ajouté",
+        countReady: {
+          one: "{n} document prêt pour l'analyse",
+          other: "{n} documents prêts pour l'analyse",
+        },
+        continueThemes: "Continuer vers les thèmes détectés",
+      },
+    },
+
+    themes: {
+      title: "Thèmes détectés par l'IA",
+      subtitle:
+        "ENTI WIN a analysé les fichiers chargés et les a regroupés par thème.",
+      filesAnalyzed: {
+        one: "{n} fichier analysé",
+        other: "{n} fichiers analysés",
+      },
+      themesDetectedCount: {
+        one: "{n} thème détecté",
+        other: "{n} thèmes détectés",
+      },
+      detected: "Détecté",
+      noFilesForTheme:
+        "Aucun document spécifique rattaché — l'IA évaluera ce thème à partir des fichiers fournis.",
+      verifyPrompt: "Vérifiez les thèmes détectés avant de lancer l'analyse.",
+      back: "Retour aux documents",
+      confirm: "Confirmer les thèmes et lancer l'analyse IA",
+    },
+
+    analyseIa: {
+      runningTitle: "Analyse IA en cours",
+      runningSubtitle:
+        "L'IA analyse vos documents pour identifier les preuves et détecter les écarts.",
+      resumingTitle: "Analyse IA reprise",
+      resumingSubtitle:
+        "Vos compléments ont été intégrés : l'IA termine l'analyse des exigences restantes.",
+      doneTitle: "Analyse terminée",
+      doneSubtitle:
+        "Les documents et vos compléments ont été pris en compte.",
+      complementsNeeded: {
+        title: "Compléments nécessaires",
+        subtitle:
+          "L'analyse a identifié quelques informations manquantes avant de pouvoir finaliser les résultats.",
+        ringLabel: "Analyse temporairement en pause",
+        infoTitle: "{n} informations à compléter",
+        infoHint:
+          "Répondez à quelques questions rapides. Vous pourrez également ajouter des documents si nécessaire.",
+        complementsCount: {
+          one: "{n} complément",
+          other: "{n} compléments",
+        },
+        answerQuestions: "Répondre aux questions",
+        seeDocuments: "Voir les documents analysés",
+        stageReadFiles: "Lecture des documents",
+        stageIdentify: "Identification des exigences",
+        stageComplements: "Compléments nécessaires",
+        stageComplementsHint: "En attente de vos réponses",
+      },
+      result: {
+        title: "Votre analyse est prête",
+        seeResults: "Voir les résultats",
+      },
+    },
+
+    stageBar: {
+      done: "Terminé",
+      inProgress: "En cours",
+      upcoming: "À venir",
+    },
+
+    complementsQuestions: {
+      title: "Questions complémentaires",
+      subtitle: "Quelques réponses suffisent pour compléter l'analyse.",
+      quickQuestions: "{n} questions rapides",
+      answeredOf: "{answered} sur {total}",
+      addFile: "Ajouter un fichier (optionnel)",
+      infoNote:
+        "Les fichiers sont facultatifs et servent uniquement à compléter vos réponses.",
+      back: "Retour",
+      verify: "Vérifier mes réponses",
+    },
+
+    complementsReview: {
+      title: "Vérifiez vos compléments",
+      subtitle: "Relisez vos réponses avant de reprendre l'analyse.",
+      summaryTitle: "Résumé des réponses",
+      noFile: "Aucun fichier",
+      edit: "Modifier",
+      addDocTitle: "Ajouter un document complémentaire",
+      addDocFormats: "PDF, DOCX, XLSX",
+      addFile: "Ajouter un fichier",
+      infoNote:
+        "Ces réponses et documents seront intégrés à l'analyse en cours.",
+      backToQuestions: "Retour aux questions",
+      sendAndResume: "Envoyer et reprendre l'analyse",
+    },
+
+    analysisLive: {
+      stages: {
+        preparation: "Préparation des fichiers",
+        extraction: "Extraction du contenu",
+        identify: "Identification des exigences",
+        evidence: "Recherche des preuves",
+        gaps: "Analyse des écarts",
+        synthesis: "Synthèse",
+      },
+      done: "Terminé",
+      inProgress: "En cours",
+      waiting: "En attente",
+      requirementsAnalyzed: "{analysed} / {total} exigences analysées",
+      themesDetectedLabel: "Thèmes détectés",
+      requirementsAnalysisTitle: "Analyse des exigences",
+      identifiedCounter: "exigences identifiées",
+      analyzedCounter: "analysées",
+      remainingCounter: "restantes",
+      searchingEvidence: "Recherche de preuves dans les documents…",
+      evidenceFound: "Preuve trouvée",
+      noEvidence: "Aucune preuve",
+      remainingRequirements: {
+        one: "{n} exigence restante",
+        other: "{n} exigences restantes",
+      },
+      ariaAnalyzing: "Analyse en cours, {value} pour cent",
+      activityLogTitle: "Activité en temps réel",
+      logIdentified: "{n} exigences identifiées",
+      logThemeDetected: "Thème {theme} détecté",
+      logExtractionDone: {
+        one: "Extraction du contenu terminée ({n} fichier)",
+        other: "Extraction du contenu terminée ({n} fichiers)",
+      },
+      logEvidenceFound: "Preuve trouvée : {source}",
+      logNoEvidence: "Aucune preuve : exigence {id}",
+      logAnalyzing: "Analyse de l'exigence {i}/{total}…",
+      logSearching: "Recherche de preuves en cours…",
+      logConsulting: "Consultation des documents…",
+    },
+
+    reportAccess: {
+      title: "Informations pour générer le rapport",
+      subtitle: "Renseignez vos informations pour accéder au rapport complet.",
+      close: "Fermer",
+      generalInfo: "Informations générales",
+      lastName: "Nom",
+      firstName: "Prénom",
+      email: "Email professionnel",
+      role: "Poste",
+      phone: "Téléphone",
+      countryCodeAria: "Indicatif pays",
+      cancel: "Annuler",
+      confirm: "Confirmer et générer le rapport",
+    },
+
+    report: {
+      overview: {
+        title: "Rapport d'analyse",
+        generate: "Générer tout le rapport",
+        globalScoreTitle: "Score global de conformité",
+        overview: "Vue d'ensemble",
+        scoresByTheme: "Scores par thème",
+        ctaHint:
+          "Générez le rapport complet pour consulter les analyses, preuves et recommandations IA.",
+      },
+      tiles: {
+        requirements: "Exigences",
+        covered: "Couvertes",
+        partial: "Partielles",
+        notIdentified: { one: "Non identifiée", other: "Non identifiées" },
+        criticalPoints: { one: "Point critique", other: "Points critiques" },
+      },
+      full: {
+        title: "Rapport complet d'analyse",
+        generatedBadge: "Rapport généré",
+        downloadPdf: "Télécharger le PDF",
+        globalTab: "Vue globale",
+        tabsHint:
+          "Sélectionnez un thème pour consulter son analyse, ses preuves et ses recommandations.",
+        scoreGlobal: "Score global de conformité",
+        scoreOfTheme: "Score {theme}",
+        weightedCoverage: "Couverture pondérée des exigences",
+        legendCovered: "Couvert = 100 %",
+        legendPartial: "Partiel = 50 %",
+        legendNotIdentified: "Non identifié = 0 %",
+        detailedAnalysis: "Analyse détaillée",
+        searchPlaceholder: "Rechercher une exigence…",
+        searchAria: "Rechercher une exigence",
+        colId: "#",
+        colRequirement: "Exigence",
+        colStatus: "Statut",
+        colCoverage: "Couverture",
+        colConfidence: "Confiance",
+        noResults: "Aucune exigence ne correspond à cette recherche.",
+        noRequirements: "Aucune exigence",
+        showingRange: "Affichage {from} à {to} sur {total} exigences",
+        prevPage: "Page précédente",
+        nextPage: "Page suivante",
+        evidenceInDoc: "Preuve dans le document",
+        noEvidenceDetail: "Aucune preuve détectée dans les documents fournis.",
+        missingElements: "Éléments manquants",
+        noMissingDetail: "Aucun élément manquant relevé.",
+        aiRecommendation: "Recommandation IA",
+        confidenceLevel: "Niveau de confiance : {n} %",
+        recommendationsTitle: "Recommandations IA prioritaires",
+        impactLabel: "Impact attendu :",
+        effortLabel: "Effort :",
+      },
+      themeSummary: {
+        deviations: {
+          title: "Couverture suffisante avec des écarts",
+          detail:
+            "Des actions correctives sont requises pour renforcer le suivi et l'efficacité.",
+        },
+        documentaire: {
+          title: "Bonne couverture globale",
+          detail:
+            "Documentation bien structurée avec quelques éléments à compléter.",
+        },
+      },
+      generatedAt: "{day} à {time}",
+      scoreAriaLabel: "Score de conformité : {score} %",
+    },
+
+    pdf: {
+      backToReport: "Retour au rapport",
+      previewPages: "Aperçu du document — {n} pages A4",
+      downloadPdf: "Télécharger le PDF",
+      brandTagline: "Évaluation qualité pharmaceutique assistée par IA",
+      reportTitle: "Rapport d'analyse de conformité",
+      analysisInProgress: "Analyse en cours",
+      scoreTitle: "Score de conformité",
+      weightedCoverageLine1: "Couverture pondérée",
+      weightedCoverageLine2: "des exigences",
+      legendLine: "Couvert = 100 % • Partiel = 50 % • Non identifié = 0 %",
+      tiles: {
+        requirements: "Exigences",
+        covered: "Couvertes",
+        partial: "Partielles",
+        notIdentified: "Non identifiées",
+        criticalPoints: "Points critiques",
+      },
+      synthesisTitle: "Synthèse des résultats",
+      synthesisContinued: "(suite)",
+      colId: "#",
+      colRequirement: "Exigence",
+      colStatus: "Statut",
+      colCriticality: "Criticité",
+      recommendationsTitle: "Recommandations IA prioritaires",
+      footerBrand: "ENTI WIN",
+      footerSubtitle: "Rapport d'analyse de conformité",
+      pageOf: "Page {page} / {total}",
+    },
+  },
 };
 
 export type Dictionary = typeof fr;

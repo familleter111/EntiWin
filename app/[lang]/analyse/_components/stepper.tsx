@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CheckIcon } from "@/app/components/icons";
 import { localePath, stripLocale } from "@/lib/i18n/config";
-import { useLocale } from "@/lib/i18n/dictionary-provider";
+import { useLocale, useTunnel } from "@/lib/i18n/dictionary-provider";
 import { WIZARD_STEPS } from "../_lib/wizard";
 import { useWizard } from "./wizard-store";
 
@@ -15,6 +15,7 @@ import { useWizard } from "./wizard-store";
 export function Stepper() {
   const pathname = usePathname();
   const locale = useLocale();
+  const { stepper } = useTunnel();
   const { data } = useWizard();
   // La comparaison se fait sur la route sans préfixe de langue.
   const route = stripLocale(pathname);
@@ -29,7 +30,7 @@ export function Stepper() {
 
   return (
     <nav
-      aria-label="Progression de l'analyse"
+      aria-label={stepper.ariaLabel}
       className="shrink-0 border-b border-line bg-white"
     >
       <ol className="mx-auto flex max-w-[1500px] items-start gap-0 overflow-x-auto px-6 pb-2.5 pt-3 xl:px-10">
@@ -40,7 +41,7 @@ export function Stepper() {
 
           const label = (
             <>
-              {i + 1}. {step.label}
+              {i + 1}. {stepper.steps[i]}
             </>
           );
 

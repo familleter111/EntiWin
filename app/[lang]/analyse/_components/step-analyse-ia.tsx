@@ -17,7 +17,8 @@ import { AnalysisLive } from "./analysis-live";
 import { ProgressRing, StageBar, ThemeIcon, type Stage } from "./analysis-ui";
 import { ComplementQuestions, ComplementReview } from "./complements";
 import { localePath } from "@/lib/i18n/config";
-import { useLocale } from "@/lib/i18n/dictionary-provider";
+import { useLocale, useTunnel } from "@/lib/i18n/dictionary-provider";
+import { format, plural } from "@/lib/i18n/interpolate";
 import { useWizard } from "./wizard-store";
 
 /**
@@ -32,6 +33,7 @@ const RESUME_MS = 8000;
 export function StepAnalyseIa() {
   const router = useRouter();
   const locale = useLocale();
+  const { analyseIa: t } = useTunnel();
   const { data, update } = useWizard();
   const files = data.files.length > 0 ? data.files : DEMO_FILES;
   const themes = detectThemes(files, locale);
@@ -49,8 +51,8 @@ export function StepAnalyseIa() {
             themes={themes}
             fileCount={files.length}
             running
-            title="Analyse IA en cours"
-            subtitle="L'IA analyse vos documents pour identifier les preuves et détecter les écarts."
+            title={t.runningTitle}
+            subtitle={t.runningSubtitle}
           />
         );
 
@@ -80,8 +82,8 @@ export function StepAnalyseIa() {
             themes={themes}
             fileCount={files.length + data.extraFiles.length}
             running
-            title="Analyse IA reprise"
-            subtitle="Vos compléments ont été intégrés : l'IA termine l'analyse des exigences restantes."
+            title={t.resumingTitle}
+            subtitle={t.resumingSubtitle}
           />
         );
 
@@ -90,7 +92,9 @@ export function StepAnalyseIa() {
           <AnalysisDone
             themes={themes}
             fileCount={files.length + data.extraFiles.length}
-            onSeeResults={() => router.push(localePath(locale, "/analyse/rapport"))}
+            onSeeResults={() =>
+              router.push(localePath(locale, "/analyse/rapport"))
+            }
           />
         );
     }
@@ -151,40 +155,36 @@ function ComplementsNeeded({
   themes: ReturnType<typeof detectThemes>;
 }) {
   const locale = useLocale();
+  const { analyseIa } = useTunnel();
+  const t = analyseIa.complementsNeeded;
   const { update } = useWizard();
   const byTheme = complementsByTheme(locale);
 
   const stages: Stage[] = [
-    { icon: FileTextIcon, label: "Lecture des documents", state: "done" },
+    { icon: FileTextIcon, label: t.stageReadFiles, state: "done" },
     {
       icon: ClipboardCheckIcon,
-      label: "Identification des exigences",
+      label: t.stageIdentify,
       state: "done",
     },
     {
       icon: SparkleIcon,
-      label: "Compléments nécessaires",
+      label: t.stageComplements,
       state: "current",
-      hint: "En attente de vos réponses",
+      hint: t.stageComplementsHint,
     },
   ];
 
   return (
     <>
       <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-        Compléments nécessaires
+        {t.title}
       </h1>
-      <p className="mt-1 text-[14px] text-ink-500">
-        L&apos;analyse a identifié quelques informations manquantes avant de
-        pouvoir finaliser les résultats.
-      </p>
+      <p className="mt-1 text-[14px] text-ink-500">{t.subtitle}</p>
 
       <div className="mt-4 grid items-stretch gap-5 lg:grid-cols-[320px_1fr]">
         <section className="flex items-center justify-center rounded-2xl border border-line bg-white p-5">
-          <ProgressRing
-            value={PAUSE_AT}
-            label="Analyse temporairement en pause"
-          />
+          <ProgressRing value={PAUSE_AT} label={t.ringLabel} />
         </section>
 
         <section className="rounded-2xl border border-brand-blue-100 bg-brand-blue-50/40 p-5">
@@ -194,12 +194,9 @@ function ComplementsNeeded({
             </span>
             <div>
               <h2 className="font-display text-xl font-bold text-brand-blue-600">
-                {COMPLEMENTS.length} informations à compléter
+                {format(t.infoTitle, { n: COMPLEMENTS.length })}
               </h2>
-              <p className="mt-0.5 text-[14px] text-ink-500">
-                Répondez à quelques questions rapides. Vous pourrez également
-                ajouter des documents si nécessaire.
-              </p>
+              <p className="mt-0.5 text-[14px] text-ink-500">{t.infoHint}</p>
             </div>
           </header>
 
@@ -209,12 +206,12 @@ function ComplementsNeeded({
                 <button
                   type="button"
                   onClick={() => update({ analysisPhase: "questions" })}
-                  className="flex w-full items-center gap-4 px-4 py-3 text-left transition-colors hover:bg-brand-blue-50/50"
+                  className="flex w-full items-center gap-4 px-4 py-3 text-start transition-colors hover:bg-brand-blue-50/50"
                 >
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-blue-50 text-brand-blue-500">
                     <ThemeIcon
                       theme={
-                        themes.find((t) => t.id === entry.theme)?.id ??
+                        themes.find((th) => th.id === entry.theme)?.id ??
                         entry.theme
                       }
                       className="h-5 w-5"
@@ -225,9 +222,9 @@ function ComplementsNeeded({
                   </span>
                   <span className="ml-auto flex items-center gap-2 text-[14px] font-semibold text-brand-blue-500">
                     <DottedCircleIcon className="h-[18px] w-[18px] animate-spin [animation-duration:2.5s]" />
-                    {entry.count} complément{entry.count > 1 ? "s" : ""}
+                    {plural(entry.count, t.complementsCount)}
                   </span>
-                  <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-300" />
+                  <ChevronRightIcon className="h-5 w-5 shrink-0 text-ink-300 rtl:-scale-x-100" />
                 </button>
               </li>
             ))}
@@ -244,8 +241,8 @@ function ComplementsNeeded({
             onClick={() => update({ analysisPhase: "questions" })}
             className="inline-flex h-12 items-center justify-center rounded-xl bg-brand-blue-500 px-6 text-[15px] font-semibold text-white transition-colors hover:bg-brand-blue-600"
           >
-            <span className="mx-auto">Répondre aux questions</span>
-            <ChevronRightIcon className="h-5 w-5" />
+            <span className="mx-auto">{t.answerQuestions}</span>
+            <ChevronRightIcon className="h-5 w-5 rtl:-scale-x-100" />
           </button>
           <Link
             href={localePath(locale, "/analyse")}
@@ -253,7 +250,7 @@ function ComplementsNeeded({
             className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl border border-brand-blue-500 bg-white px-6 text-[15px] font-semibold text-brand-blue-500 transition-colors hover:bg-brand-blue-50"
           >
             <FileTextIcon className="h-5 w-5" />
-            Voir les documents analysés
+            {t.seeDocuments}
           </Link>
         </div>
       </div>
@@ -274,6 +271,9 @@ function AnalysisDone({
   fileCount: number;
   onSeeResults: () => void;
 }) {
+  const { analyseIa } = useTunnel();
+  const t = analyseIa.result;
+
   return (
     <>
       {/* Le tableau de bord reste affiché, figé à 100 % : on voit ce qui a
@@ -283,21 +283,21 @@ function AnalysisDone({
         themes={themes}
         fileCount={fileCount}
         running={false}
-        title="Analyse terminée"
-        subtitle="Les documents et vos compléments ont été pris en compte."
+        title={analyseIa.doneTitle}
+        subtitle={analyseIa.doneSubtitle}
       />
 
       <section className="mt-3 flex shrink-0 flex-col items-center gap-3.5 rounded-2xl border border-brand-blue-100 bg-brand-blue-50/50 px-6 py-6">
         <h2 className="font-display text-[clamp(1.6rem,2.2vw,2.1rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-          Votre analyse est prête
+          {t.title}
         </h2>
         <button
           type="button"
           onClick={onSeeResults}
           className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-navy-800 px-9 text-[17px] font-semibold text-white transition-colors hover:bg-navy-900"
         >
-          Voir les résultats
-          <ArrowRightIcon className="h-[22px] w-[22px]" />
+          {t.seeResults}
+          <ArrowRightIcon className="h-[22px] w-[22px] rtl:-scale-x-100" />
         </button>
       </section>
     </>

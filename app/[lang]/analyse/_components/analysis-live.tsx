@@ -13,7 +13,11 @@ import {
 } from "@/app/components/icons";
 import type { detectThemes } from "../_lib/documents";
 import { REQUIREMENTS } from "../_lib/requirements";
-import { useLocale } from "@/lib/i18n/dictionary-provider";
+import type { Locale } from "@/lib/i18n/config";
+import { useLocale, useTunnel } from "@/lib/i18n/dictionary-provider";
+import { formatDate } from "@/lib/i18n/format";
+import { format, plural } from "@/lib/i18n/interpolate";
+import type { Dictionary } from "@/lib/i18n/dictionaries/fr";
 import { ThemeIcon } from "./analysis-ui";
 
 const TOTAL = REQUIREMENTS.length;
@@ -21,16 +25,20 @@ const TOTAL = REQUIREMENTS.length;
 /**
  * Les six phases du moteur, exprimées en % de progression globale. La
  * recherche des preuves occupe la majeure partie du trajet : c'est elle qui
- * fait défiler les exigences une à une.
+ * fait défiler les exigences une à une. `key` pointe vers `tunnel.analysisLive.stages`.
  */
 const STAGES = [
-  { label: "Préparation des fichiers", from: 0, to: 5 },
-  { label: "Extraction du contenu", from: 5, to: 10 },
-  { label: "Identification des exigences", from: 10, to: 15 },
-  { label: "Recherche des preuves", from: 15, to: 85 },
-  { label: "Analyse des écarts", from: 85, to: 95 },
-  { label: "Synthèse", from: 95, to: 100 },
-] as const;
+  { key: "preparation", from: 0, to: 5 },
+  { key: "extraction", from: 5, to: 10 },
+  { key: "identify", from: 10, to: 15 },
+  { key: "evidence", from: 15, to: 85 },
+  { key: "gaps", from: 85, to: 95 },
+  { key: "synthesis", from: 95, to: 100 },
+] as const satisfies {
+  key: keyof Dictionary["tunnel"]["analysisLive"]["stages"];
+  from: number;
+  to: number;
+}[];
 
 const EVIDENCE_FROM = 15;
 const EVIDENCE_TO = 85;
@@ -74,6 +82,7 @@ export function AnalysisLive({
   running: boolean;
 }) {
   const locale = useLocale();
+  const t = useTunnel().analysisLive;
   const analysed = analysedAt(progress);
   const sub = subProgressAt(progress);
   const currentIndex = Math.min(analysed, TOTAL - 1);
@@ -98,7 +107,7 @@ export function AnalysisLive({
           <p className="mt-1 text-[14px] text-ink-500">{subtitle}</p>
 
           <p className="mt-3 text-[13.5px] font-semibold text-navy-900">
-            Thèmes détectés
+            {t.themesDetectedLabel}
           </p>
           <ul className="mt-1.5 flex flex-wrap gap-3">
             {themes.map((theme) => (
@@ -123,11 +132,12 @@ export function AnalysisLive({
         {STAGES.map((stage, i) => {
           const done = progress >= stage.to;
           const current = !done && progress >= stage.from;
-          const isEvidence = stage.label === "Recherche des preuves";
+          const isEvidence = stage.key === "evidence";
+          const label = t.stages[stage.key];
 
           return (
             <li
-              key={stage.label}
+              key={stage.key}
               className="flex min-w-0 flex-1 flex-col items-center"
             >
               <div className="flex w-full items-center">
@@ -175,7 +185,7 @@ export function AnalysisLive({
                   done || current ? "text-navy-900" : "text-ink-300"
                 }`}
               >
-                {stage.label}
+                {label}
               </p>
               <p
                 className={`mt-0.5 text-center text-[11.5px] leading-[1.25] ${
@@ -187,12 +197,12 @@ export function AnalysisLive({
                 }`}
               >
                 {done
-                  ? "Terminé"
+                  ? t.done
                   : current
                     ? isEvidence
-                      ? `${analysed} / ${TOTAL} exigences analysées`
-                      : "En cours"
-                    : "En attente"}
+                      ? format(t.requirementsAnalyzed, { analysed, total: TOTAL })
+                      : t.inProgress
+                    : t.waiting}
               </p>
             </li>
           );
@@ -204,14 +214,14 @@ export function AnalysisLive({
         <section className="flex min-h-0 flex-col rounded-2xl border border-line bg-white p-4">
           <header className="flex flex-wrap items-center gap-4">
             <h2 className="font-display text-[17px] font-bold text-navy-900">
-              Analyse des exigences
+              {t.requirementsAnalysisTitle}
             </h2>
             <ul className="ml-auto flex items-center divide-x divide-line">
-              <Counter value={TOTAL} label="exigences identifiées" tone="navy" />
-              <Counter value={analysed} label="analysées" tone="blue" />
+              <Counter value={TOTAL} label={t.identifiedCounter} tone="navy" />
+              <Counter value={analysed} label={t.analyzedCounter} tone="blue" />
               <Counter
                 value={TOTAL - analysed}
-                label="restantes"
+                label={t.remainingCounter}
                 tone="muted"
               />
             </ul>
@@ -263,7 +273,7 @@ export function AnalysisLive({
                     {isCurrent && (
                       <>
                         <p className="text-[12px] text-ink-500">
-                          Recherche de preuves dans les documents…
+                          {t.searchingEvidence}
                         </p>
                         <span className="mt-1 flex items-center gap-2.5">
                           <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-brand-blue-100">
@@ -292,7 +302,7 @@ export function AnalysisLive({
                     >
                       {isDone ? (
                         <>
-                          {found ? "Preuve trouvée" : "Aucune preuve"}
+                          {found ? t.evidenceFound : t.noEvidence}
                           {found ? (
                             <CheckCircleSolidIcon className="h-[18px] w-[18px] text-green-500" />
                           ) : (
@@ -300,7 +310,7 @@ export function AnalysisLive({
                           )}
                         </>
                       ) : (
-                        "En attente"
+                        t.waiting
                       )}
                     </span>
                   )}
@@ -313,8 +323,7 @@ export function AnalysisLive({
                 <span className="flex h-6 w-8 shrink-0 items-center justify-center font-bold tracking-widest">
                   …
                 </span>
-                {remaining} exigence{remaining > 1 ? "s" : ""} restante
-                {remaining > 1 ? "s" : ""}
+                {plural(remaining, t.remainingRequirements)}
               </li>
             )}
           </ul>
@@ -361,6 +370,7 @@ function Counter({
 }
 
 function LiveRing({ value, running }: { value: number; running: boolean }) {
+  const t = useTunnel().analysisLive;
   const circumference = 2 * Math.PI * 44;
   // Analyse bouclée : l'anneau passe au vert, comme partout ailleurs.
   const finished = value >= 100;
@@ -404,7 +414,7 @@ function LiveRing({ value, running }: { value: number; running: boolean }) {
       </span>
       {running && (
         <span className="sr-only" role="status">
-          Analyse en cours, {value} pour cent
+          {format(t.ariaAnalyzing, { value })}
         </span>
       )}
     </div>
@@ -427,19 +437,21 @@ function ActivityLog({
   themes: ReturnType<typeof detectThemes>;
   running: boolean;
 }) {
+  const locale = useLocale();
+  const t = useTunnel().analysisLive;
   const startedAt = useStartTime();
 
   const lines: LogLine[] = [
-    { icon: "check", text: `${TOTAL} exigences identifiées` },
+    { icon: "check", text: format(t.logIdentified, { n: TOTAL }) },
     ...themes.map(
       (theme): LogLine => ({
         icon: "tag",
-        text: `Thème ${theme.label} détecté`,
+        text: format(t.logThemeDetected, { theme: theme.label }),
       }),
     ),
     {
       icon: "doc",
-      text: `Extraction du contenu terminée (${fileCount} fichier${fileCount > 1 ? "s" : ""})`,
+      text: plural(fileCount, t.logExtractionDone),
     },
   ];
 
@@ -447,31 +459,39 @@ function ActivityLog({
     const requirement = REQUIREMENTS[i];
     lines.push(
       requirement.evidence
-        ? { icon: "search", text: `Preuve trouvée : ${requirement.evidence.source}` }
-        : { icon: "miss", text: `Aucune preuve : exigence ${requirement.id}` },
+        ? {
+            icon: "search",
+            text: format(t.logEvidenceFound, {
+              source: requirement.evidence.source[locale],
+            }),
+          }
+        : {
+            icon: "miss",
+            text: format(t.logNoEvidence, { id: requirement.id }),
+          },
     );
   }
 
   if (running && analysed < TOTAL) {
     lines.push({
       icon: "spin",
-      text: `Analyse de l'exigence ${analysed + 1}/${TOTAL}…`,
+      text: format(t.logAnalyzing, { i: analysed + 1, total: TOTAL }),
       active: true,
     });
-    lines.push({ icon: "clock", text: "Recherche de preuves en cours…" });
-    lines.push({ icon: "clock", text: "Consultation des documents…" });
+    lines.push({ icon: "clock", text: t.logSearching });
+    lines.push({ icon: "clock", text: t.logConsulting });
   }
 
   // Horodatage figé par rang : une ligne déjà écrite ne bouge plus.
   const stamped = lines.map((line, i) => ({
     ...line,
-    time: startedAt ? clock(startedAt + i * 2000) : "",
+    time: startedAt ? clock(startedAt + i * 2000, locale) : "",
   }));
 
   return (
     <section className="flex min-h-0 flex-col rounded-2xl border border-line bg-white p-4">
       <h2 className="font-display text-[17px] font-bold text-navy-900">
-        Activité en temps réel
+        {t.activityLogTitle}
       </h2>
 
       <ul className="mt-2 grid min-h-0 flex-1 content-start gap-0.5">
@@ -539,10 +559,10 @@ function useStartTime() {
   return startedAt;
 }
 
-function clock(ms: number) {
-  return new Intl.DateTimeFormat("fr-FR", {
+function clock(ms: number, locale: Locale) {
+  return formatDate(ms, locale, {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-  }).format(new Date(ms));
+  });
 }

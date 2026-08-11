@@ -11,13 +11,15 @@ import {
   SparkleIcon,
 } from "@/app/components/icons";
 import { localePath } from "@/lib/i18n/config";
-import { useLocale } from "@/lib/i18n/dictionary-provider";
+import { useLocale, useTunnel } from "@/lib/i18n/dictionary-provider";
+import { plural } from "@/lib/i18n/interpolate";
 import { DEMO_FILES, detectThemes } from "../_lib/documents";
 import { useWizard } from "./wizard-store";
 
 export function StepThemes() {
   const router = useRouter();
   const locale = useLocale();
+  const t = useTunnel().themes;
   const { data, update } = useWizard();
   const files = data.files.length > 0 ? data.files : DEMO_FILES;
   const themes = detectThemes(files, locale);
@@ -33,20 +35,16 @@ export function StepThemes() {
       <div className="flex flex-wrap items-start gap-4">
         <div>
           <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-            Thèmes détectés par l&apos;IA
+            {t.title}
           </h1>
-          <p className="mt-1 text-[14px] text-ink-500">
-            ENTI WIN a analysé les fichiers chargés et les a regroupés par thème.
-          </p>
+          <p className="mt-1 text-[14px] text-ink-500">{t.subtitle}</p>
         </div>
 
         <p className="ml-auto inline-flex items-center gap-2.5 rounded-xl bg-brand-blue-50 px-4 py-2.5 text-[14px] font-semibold text-brand-blue-600">
           <SparkleIcon className="h-[18px] w-[18px]" />
-          {files.length} fichier{files.length > 1 ? "s" : ""} analysé
-          {files.length > 1 ? "s" : ""}
+          {plural(files.length, t.filesAnalyzed)}
           <span className="text-brand-blue-500/60">•</span>
-          {themes.length} thème{themes.length > 1 ? "s" : ""} détecté
-          {themes.length > 1 ? "s" : ""}
+          {plural(themes.length, t.themesDetectedCount)}
         </p>
       </div>
 
@@ -69,15 +67,14 @@ export function StepThemes() {
               </h2>
               <span className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-brand-blue-50 px-3 py-1.5 text-[13px] font-semibold text-brand-blue-600">
                 <SparkleIcon className="h-4 w-4" />
-                Détecté
+                {t.detected}
               </span>
             </header>
 
             <ul className="mt-4 grid gap-2.5">
               {theme.files.length === 0 && (
                 <li className="rounded-xl border border-dashed border-line px-4 py-3 text-[14px] text-ink-500">
-                  Aucun document spécifique rattaché — l&apos;IA évaluera ce
-                  thème à partir des fichiers fournis.
+                  {t.noFilesForTheme}
                 </li>
               )}
               {theme.files.map((file) => (
@@ -89,7 +86,7 @@ export function StepThemes() {
                   <span className="min-w-0 flex-1 truncate text-[14px] text-navy-900">
                     {file.name}
                   </span>
-                  <ArrowRightIcon className="h-4 w-4 shrink-0 text-ink-300" />
+                  <ArrowRightIcon className="h-4 w-4 shrink-0 text-ink-300 rtl:-scale-x-100" />
                   <span className="w-[45%] shrink-0 text-[14px] text-navy-900">
                     {file.description}
                   </span>
@@ -101,7 +98,7 @@ export function StepThemes() {
       </div>
 
       <p className="mt-5 text-center text-[14px] text-ink-500 lg:mt-auto lg:pt-4">
-        Vérifiez les thèmes détectés avant de lancer l&apos;analyse.
+        {t.verifyPrompt}
       </p>
 
       <div className="mt-4 flex flex-col justify-center gap-4 sm:flex-row">
@@ -110,8 +107,8 @@ export function StepThemes() {
           prefetch
           className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl border border-navy-800 bg-white px-6 text-[15px] font-semibold text-navy-900 transition-colors hover:bg-navy-50"
         >
-          <ArrowLeftIcon className="h-[18px] w-[18px]" />
-          Retour aux documents
+          <ArrowLeftIcon className="h-[18px] w-[18px] rtl:-scale-x-100" />
+          {t.back}
         </Link>
         <button
           type="button"
@@ -119,7 +116,7 @@ export function StepThemes() {
           className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl bg-brand-blue-500 px-6 text-[15px] font-semibold text-white transition-colors hover:bg-brand-blue-600"
         >
           <SparkleIcon className="h-5 w-5" />
-          Confirmer les thèmes et lancer l&apos;analyse IA
+          {t.confirm}
         </button>
       </div>
     </div>

@@ -21,7 +21,11 @@ import {
   StatusChip,
 } from "../../analyse/_components/requirement-chips";
 import { useWizard } from "../../analyse/_components/wizard-store";
-import { useLocale } from "@/lib/i18n/dictionary-provider";
+import { localePath, type Locale } from "@/lib/i18n/config";
+import { useLocale, useTunnel } from "@/lib/i18n/dictionary-provider";
+import { formatDate } from "@/lib/i18n/format";
+import { format } from "@/lib/i18n/interpolate";
+import type { Dictionary } from "@/lib/i18n/dictionaries/fr";
 import { DEMO_FILES } from "../../analyse/_lib/documents";
 import {
   complianceScore,
@@ -42,6 +46,7 @@ const RECO_ICONS = [SparkleIcon, BarsIcon, LinkIcon];
 
 export function ReportDocument() {
   const locale = useLocale();
+  const t = useTunnel().pdf;
   const { data } = useWizard();
   const files = data.files.length > 0 ? data.files : DEMO_FILES;
   const stats = requirementStats();
@@ -61,7 +66,7 @@ export function ReportDocument() {
           <Letterhead />
 
           <h1 className="mt-6 font-display text-[27px] font-extrabold tracking-[-0.02em] text-navy-900">
-            Rapport d&apos;analyse de conformité
+            {t.reportTitle}
           </h1>
 
           <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12.5px] text-ink-500">
@@ -72,14 +77,14 @@ export function ReportDocument() {
             <span className="text-line">|</span>
             <span className="flex items-center gap-2">
               <CalendarIcon className="h-4 w-4 shrink-0" />
-              <AnalysisDate at={data.completedAt} />
+              <AnalysisDate at={data.completedAt} locale={locale} t={t} />
             </span>
           </div>
 
           <ScoreBlock score={score} stats={stats} />
 
           <h2 className="mt-6 font-display text-[19px] font-bold text-navy-900">
-            Synthèse des résultats
+            {t.synthesisTitle}
           </h2>
           <SynthesisTable rows={firstRows} className="mt-2.5" />
 
@@ -91,13 +96,15 @@ export function ReportDocument() {
           <Letterhead compact />
 
           <h2 className="mt-5 font-display text-[19px] font-bold text-navy-900">
-            Synthèse des résultats{" "}
-            <span className="font-semibold text-ink-500">(suite)</span>
+            {t.synthesisTitle}{" "}
+            <span className="font-semibold text-ink-500">
+              {t.synthesisContinued}
+            </span>
           </h2>
           <SynthesisTable rows={restRows} className="mt-2.5" />
 
           <h2 className="mt-6 font-display text-[19px] font-bold text-navy-900">
-            Recommandations IA prioritaires
+            {t.recommendationsTitle}
           </h2>
           <ol className="mt-3 grid gap-3">
             {recommendations.map((reco, i) => {
@@ -137,20 +144,23 @@ export function ReportDocument() {
 
 /** Barre d'aperçu : absente du PDF (classe `no-print`). */
 function Toolbar() {
+  const locale = useLocale();
+  const t = useTunnel().pdf;
+
   return (
     <div className="no-print sticky top-0 z-10 border-b border-line bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-[1100px] flex-wrap items-center gap-3 px-6 py-3">
         <Link
-          href="/analyse/rapport"
+          href={localePath(locale, "/analyse/rapport")}
           prefetch
           className="inline-flex h-11 items-center gap-2.5 rounded-xl border border-line bg-white px-5 text-[14.5px] font-semibold text-navy-900 transition-colors hover:border-navy-200 hover:bg-navy-50"
         >
-          <ArrowLeftIcon className="h-[18px] w-[18px]" />
-          Retour au rapport
+          <ArrowLeftIcon className="h-[18px] w-[18px] rtl:-scale-x-100" />
+          {t.backToReport}
         </Link>
 
         <p className="hidden text-[13.5px] text-ink-500 sm:block">
-          Aperçu du document — {TOTAL_SHEETS} pages A4
+          {format(t.previewPages, { n: TOTAL_SHEETS })}
         </p>
 
         <button
@@ -159,7 +169,7 @@ function Toolbar() {
           className="ml-auto inline-flex h-11 items-center gap-2.5 rounded-xl bg-brand-blue-500 px-5 text-[14.5px] font-semibold text-white transition-colors hover:bg-brand-blue-600"
         >
           <DownloadIcon className="h-[18px] w-[18px]" />
-          Télécharger le PDF
+          {t.downloadPdf}
         </button>
       </div>
     </div>
@@ -168,6 +178,8 @@ function Toolbar() {
 
 /** En-tête de marque, repris en haut de chaque feuille. */
 function Letterhead({ compact = false }: { compact?: boolean }) {
+  const t = useTunnel().pdf;
+
   return (
     <header className="flex items-center gap-3">
       <Logo
@@ -181,7 +193,7 @@ function Letterhead({ compact = false }: { compact?: boolean }) {
         ENTI WIN
       </span>
       <span className="max-w-[210px] text-[9.5px] font-semibold uppercase leading-tight tracking-[0.06em] text-ink-300">
-        Évaluation qualité pharmaceutique assistée par IA
+        {t.brandTagline}
       </span>
     </header>
   );
@@ -194,6 +206,7 @@ function ScoreBlock({
   score: number;
   stats: ReturnType<typeof requirementStats>;
 }) {
+  const t = useTunnel().pdf;
   const circumference = 2 * Math.PI * 44;
 
   return (
@@ -227,15 +240,15 @@ function ScoreBlock({
 
       <div className="w-[196px] shrink-0">
         <p className="whitespace-nowrap font-display text-[15.5px] font-bold text-navy-900">
-          Score de conformité
+          {t.scoreTitle}
         </p>
         <p className="mt-1 text-[12.5px] leading-[1.35] text-ink-500">
-          Couverture pondérée
+          {t.weightedCoverageLine1}
           <br />
-          des exigences
+          {t.weightedCoverageLine2}
         </p>
         <p className="mt-2 text-[10.5px] leading-[1.4] text-ink-500">
-          Couvert = 100 % • Partiel = 50 % • Non identifié = 0 %
+          {t.legendLine}
         </p>
       </div>
 
@@ -244,31 +257,31 @@ function ScoreBlock({
           icon={<ClipboardCheckIcon className="h-6 w-6" />}
           tone="navy"
           value={stats.total}
-          label="Exigences"
+          label={t.tiles.requirements}
         />
         <PdfTile
           icon={<CheckCircleIcon className="h-6 w-6" />}
           tone="green"
           value={stats.couvertes}
-          label="Couvertes"
+          label={t.tiles.covered}
         />
         <PdfTile
           icon={<PieIcon className="h-6 w-6" />}
           tone="blue"
           value={stats.partielles}
-          label="Partielles"
+          label={t.tiles.partial}
         />
         <PdfTile
           icon={<XCircleIcon className="h-6 w-6" />}
           tone="danger"
           value={stats.nonIdentifiees}
-          label="Non identifiées"
+          label={t.tiles.notIdentified}
         />
         <PdfTile
           icon={<AlertTriangleIcon className="h-6 w-6" />}
           tone="blue"
           value={stats.critiques}
-          label="Points critiques"
+          label={t.tiles.criticalPoints}
         />
       </ul>
     </section>
@@ -318,17 +331,20 @@ function SynthesisTable({
   className?: string;
 }) {
   const locale = useLocale();
+  const t = useTunnel().pdf;
 
   return (
     <table
-      className={`w-full table-fixed border-collapse overflow-hidden rounded-lg text-left ${className}`}
+      className={`w-full table-fixed border-collapse overflow-hidden rounded-lg text-start ${className}`}
     >
       <thead>
         <tr className="bg-navy-800 text-[12.5px] font-semibold text-white">
-          <th className="w-[38px] px-3 py-2 font-semibold">#</th>
-          <th className="px-3 py-2 font-semibold">Exigence</th>
-          <th className="w-[175px] px-3 py-2 font-semibold">Statut</th>
-          <th className="w-[110px] px-3 py-2 font-semibold">Criticité</th>
+          <th className="w-[38px] px-3 py-2 font-semibold">{t.colId}</th>
+          <th className="px-3 py-2 font-semibold">{t.colRequirement}</th>
+          <th className="w-[175px] px-3 py-2 font-semibold">{t.colStatus}</th>
+          <th className="w-[110px] px-3 py-2 font-semibold">
+            {t.colCriticality}
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -365,30 +381,32 @@ function SynthesisTable({
 }
 
 function SheetFooter({ page }: { page: number }) {
+  const t = useTunnel().pdf;
+
   return (
     <footer className="mt-auto flex items-end justify-between border-t border-line pt-3 text-[11.5px] text-ink-500">
       <span>
-        <span className="font-bold text-navy-900">ENTI WIN</span> — Rapport
-        d&apos;analyse de conformité
+        <span className="font-bold text-navy-900">{t.footerBrand}</span> —{" "}
+        {t.footerSubtitle}
       </span>
-      <span>
-        Page {page} / {TOTAL_SHEETS}
-      </span>
+      <span>{format(t.pageOf, { page, total: TOTAL_SHEETS })}</span>
     </footer>
   );
 }
 
 /** Date de fin d'analyse — rendue seulement après hydratation. */
-function AnalysisDate({ at }: { at: number }) {
-  if (!at) return <>Analyse en cours</>;
+function AnalysisDate({
+  at,
+  locale,
+  t,
+}: {
+  at: number;
+  locale: Locale;
+  t: Dictionary["tunnel"]["pdf"];
+}) {
+  if (!at) return <>{t.analysisInProgress}</>;
 
   return (
-    <>
-      {new Intl.DateTimeFormat("fr-FR", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }).format(new Date(at))}
-    </>
+    <>{formatDate(at, locale, { day: "numeric", month: "long", year: "numeric" })}</>
   );
 }

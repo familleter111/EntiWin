@@ -20,7 +20,8 @@ import {
   type UploadedFile,
 } from "../_lib/documents";
 import { localePath } from "@/lib/i18n/config";
-import { useLocale } from "@/lib/i18n/dictionary-provider";
+import { useLocale, useTunnel } from "@/lib/i18n/dictionary-provider";
+import { format, plural } from "@/lib/i18n/interpolate";
 import { useWizard } from "./wizard-store";
 
 /**
@@ -29,6 +30,7 @@ import { useWizard } from "./wizard-store";
  * fermée : c'est ce qui rend l'ordre évident sans texte d'explication.
  */
 export function StepPreparation() {
+  const { preparation: t } = useTunnel();
   const { data, update } = useWizard();
   const [draft, setDraft] = useState(data.organisation);
   const [editing, setEditing] = useState(false);
@@ -48,12 +50,9 @@ export function StepPreparation() {
     // centrage s'annule au lieu de rogner le haut.
     <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col px-6 py-4 lg:[justify-content:safe_center] xl:px-10">
       <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-        Préparez votre analyse
+        {t.title}
       </h1>
-      <p className="mt-1 text-[14px] text-ink-500">
-        Suivez les étapes pour générer votre rapport réglementaire assisté par
-        IA.
-      </p>
+      <p className="mt-1 text-[14px] text-ink-500">{t.subtitle}</p>
 
       {/* ---------------- Organisation ---------------- */}
       {confirmed ? (
@@ -63,7 +62,7 @@ export function StepPreparation() {
           </span>
           <span className="min-w-0">
             <span className="block text-[12.5px] text-ink-500">
-              Organisation
+              {t.org.title}
             </span>
             <span className="block truncate font-display text-[17px] font-bold text-navy-900">
               {data.organisation}
@@ -72,7 +71,7 @@ export function StepPreparation() {
 
           <span className="ml-auto flex items-center gap-2 text-[13.5px] font-semibold text-green-600">
             <CheckCircleSolidIcon className="h-[18px] w-[18px] text-green-500" />
-            Organisation renseignée
+            {t.org.confirmedLabel}
           </span>
           <button
             type="button"
@@ -82,7 +81,7 @@ export function StepPreparation() {
             }}
             className="inline-flex h-10 items-center rounded-xl border border-line bg-white px-5 text-[14px] font-semibold text-navy-900 transition-colors hover:border-navy-200 hover:bg-navy-50"
           >
-            Modifier
+            {t.org.edit}
           </button>
         </section>
       ) : (
@@ -93,11 +92,9 @@ export function StepPreparation() {
             </span>
             <div>
               <h2 className="font-display text-[17px] font-bold text-navy-900">
-                Organisation
+                {t.org.title}
               </h2>
-              <p className="mt-0.5 text-[13.5px] text-ink-500">
-                Indiquez le nom de votre organisation pour commencer.
-              </p>
+              <p className="mt-0.5 text-[13.5px] text-ink-500">{t.org.hint}</p>
             </div>
           </header>
 
@@ -105,14 +102,14 @@ export function StepPreparation() {
             htmlFor="organisation"
             className="mt-4 block text-[13.5px] font-semibold text-navy-900"
           >
-            Nom de l&apos;organisation <span className="text-danger">*</span>
+            {t.org.label} <span className="text-danger">*</span>
           </label>
           <input
             id="organisation"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && confirmOrganisation()}
-            placeholder="Nom de votre organisation"
+            placeholder={t.org.placeholder}
             autoComplete="organization"
             className="mt-2 h-12 w-full rounded-xl border border-line bg-white px-4 text-[15px] text-navy-900 outline-none transition-colors placeholder:text-ink-300 focus:border-navy-500"
           />
@@ -124,8 +121,8 @@ export function StepPreparation() {
               disabled={draft.trim() === ""}
               className="inline-flex h-12 items-center gap-2.5 rounded-xl bg-navy-800 px-6 text-[15px] font-semibold text-white transition-colors hover:bg-navy-900 disabled:cursor-not-allowed disabled:bg-ink-300"
             >
-              Continuer
-              <ArrowRightIcon className="h-5 w-5" />
+              {t.org.continue}
+              <ArrowRightIcon className="h-5 w-5 rtl:-scale-x-100" />
             </button>
           </div>
         </section>
@@ -141,10 +138,10 @@ export function StepPreparation() {
           </span>
           <div>
             <h2 className="font-display text-[17px] font-bold text-navy-900">
-              Chargez vos documents
+              {t.docsClosed.title}
             </h2>
             <p className="mt-0.5 text-[13.5px] text-ink-500">
-              Cette section s&apos;ouvrira après validation de l&apos;organisation.
+              {t.docsClosed.hint}
             </p>
           </div>
           <ChevronDownIcon className="ml-auto h-5 w-5 shrink-0 text-ink-300" />
@@ -158,6 +155,8 @@ export function StepPreparation() {
 
 function DocumentsPanel() {
   const locale = useLocale();
+  const { preparation } = useTunnel();
+  const t = preparation.docs;
   const { data, update } = useWizard();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -202,13 +201,10 @@ function DocumentsPanel() {
       </span>
 
       <h2 className="font-display text-[19px] font-bold text-navy-900">
-        Chargez vos documents
+        {t.title}
       </h2>
       <p className="mt-1 text-[13px] leading-[1.5] text-ink-500">
-        Exemples de documents : procédure de gestion des déviations, procédure
-        CAPA, formulaire ou modèle de déviation, procédure de Change Control,
-        SOP approuvée, rapport d&apos;audit, réclamation qualité, rapport
-        APR/PQR…
+        {t.examples}
       </p>
 
       <div
@@ -231,14 +227,12 @@ function DocumentsPanel() {
       >
         <UploadIcon className="mx-auto h-7 w-7 text-navy-900" />
         <p className="mt-1.5 font-display text-[15px] font-bold text-navy-900">
-          Déposez vos fichiers ici
+          {t.dropzoneTitle}
         </p>
-        <p className="mt-0.5 text-[13px] text-ink-500">
-          ou cliquez pour parcourir vos fichiers
-        </p>
-        <p className="text-[13px] text-ink-500">PDF, DOCX, XLSX</p>
+        <p className="mt-0.5 text-[13px] text-ink-500">{t.dropzoneHint}</p>
+        <p className="text-[13px] text-ink-500">{t.formats}</p>
         <span className="mt-2.5 inline-flex h-10 items-center rounded-xl border border-navy-800 bg-white px-5 text-[14px] font-semibold text-navy-900 transition-colors hover:bg-navy-50">
-          Sélectionner des fichiers
+          {t.selectButton}
         </span>
         <input
           ref={inputRef}
@@ -267,16 +261,16 @@ function DocumentsPanel() {
               >
                 {file.name}
               </span>
-              <span className="w-20 shrink-0 text-right text-[13.5px] text-ink-500">
+              <span className="w-20 shrink-0 text-end text-[13.5px] text-ink-500">
                 {formatSize(file.size, locale)}
               </span>
               <span className="flex w-24 shrink-0 items-center gap-2 text-[13.5px] font-semibold text-green-600">
                 <CheckCircleSolidIcon className="h-[18px] w-[18px] text-green-500" />
-                Prêt
+                {t.ready}
               </span>
               <button
                 type="button"
-                aria-label={`Retirer ${file.name}`}
+                aria-label={format(t.removeAria, { name: file.name })}
                 onClick={() => removeFile(i)}
                 className="shrink-0 rounded-lg p-1.5 text-danger/80 transition-colors hover:bg-danger/10 hover:text-danger"
               >
@@ -291,11 +285,10 @@ function DocumentsPanel() {
         {count > 0 ? (
           <p className="flex items-center gap-2 text-[14px] font-semibold text-green-600">
             <CheckCircleSolidIcon className="h-[18px] w-[18px] text-green-500" />
-            {count} document{count > 1 ? "s" : ""} prêt{count > 1 ? "s" : ""}{" "}
-            pour l&apos;analyse
+            {plural(count, t.countReady)}
           </p>
         ) : (
-          <p className="text-[14px] text-ink-500">Aucun fichier ajouté</p>
+          <p className="text-[14px] text-ink-500">{t.noFiles}</p>
         )}
 
         {count > 0 ? (
@@ -304,13 +297,13 @@ function DocumentsPanel() {
             prefetch
             className="ml-auto inline-flex h-12 items-center gap-2.5 rounded-xl bg-brand-blue-500 px-6 text-[15px] font-semibold text-white transition-colors hover:bg-brand-blue-600"
           >
-            Continuer vers les thèmes détectés
-            <ArrowRightIcon className="h-5 w-5" />
+            {t.continueThemes}
+            <ArrowRightIcon className="h-5 w-5 rtl:-scale-x-100" />
           </Link>
         ) : (
           <span className="ml-auto inline-flex h-12 cursor-not-allowed items-center gap-2.5 rounded-xl bg-brand-blue-500/40 px-6 text-[15px] font-semibold text-white">
-            Continuer vers les thèmes détectés
-            <ArrowRightIcon className="h-5 w-5" />
+            {t.continueThemes}
+            <ArrowRightIcon className="h-5 w-5 rtl:-scale-x-100" />
           </span>
         )}
       </footer>

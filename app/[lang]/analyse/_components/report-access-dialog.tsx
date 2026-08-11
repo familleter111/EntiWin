@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { ChevronDownIcon, XIcon } from "@/app/components/icons";
+import { useTunnel } from "@/lib/i18n/dictionary-provider";
 import { COUNTRIES, type CountryCode } from "../_lib/wizard";
 import { useWizard } from "./wizard-store";
 
@@ -20,6 +21,8 @@ export function ReportAccessDialog({
   onClose: () => void;
   onConfirm: () => void;
 }) {
+  const t = useTunnel().reportAccess;
+  const countries = useTunnel().countries;
   const { data, update } = useWizard();
 
   useEffect(() => {
@@ -54,16 +57,14 @@ export function ReportAccessDialog({
             id="report-access-title"
             className="font-display text-[22px] font-extrabold tracking-[-0.01em] text-navy-900"
           >
-            Informations pour générer le rapport
+            {t.title}
           </h2>
-          <p className="mt-1.5 text-[14px] text-ink-500">
-            Renseignez vos informations pour accéder au rapport complet.
-          </p>
+          <p className="mt-1.5 text-[14px] text-ink-500">{t.subtitle}</p>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Fermer"
-            className="absolute right-6 top-6 rounded-lg p-1.5 text-ink-500 transition-colors hover:bg-navy-50 hover:text-navy-900"
+            aria-label={t.close}
+            className="absolute end-6 top-6 rounded-lg p-1.5 text-ink-500 transition-colors hover:bg-navy-50 hover:text-navy-900"
           >
             <XIcon className="h-5 w-5" />
           </button>
@@ -77,20 +78,20 @@ export function ReportAccessDialog({
         >
           <div className="px-8 pt-5">
             <h3 className="font-display text-[15px] font-bold text-navy-900">
-              Informations générales
+              {t.generalInfo}
             </h3>
 
             <div className="mt-3 grid gap-3.5 sm:grid-cols-2">
               <Field
                 id="lastName"
-                label="Nom"
+                label={t.lastName}
                 value={data.lastName}
                 onChange={(lastName) => update({ lastName })}
                 autoComplete="family-name"
               />
               <Field
                 id="firstName"
-                label="Prénom"
+                label={t.firstName}
                 value={data.firstName}
                 onChange={(firstName) => update({ firstName })}
                 autoComplete="given-name"
@@ -100,7 +101,7 @@ export function ReportAccessDialog({
             <div className="mt-3.5 grid gap-3.5">
               <Field
                 id="email"
-                label="Email professionnel"
+                label={t.email}
                 type="email"
                 value={data.email}
                 onChange={(email) => update({ email })}
@@ -108,30 +109,44 @@ export function ReportAccessDialog({
               />
               <Field
                 id="role"
-                label="Poste"
+                label={t.role}
                 value={data.role}
                 onChange={(role) => update({ role })}
                 autoComplete="organization-title"
               />
 
               <div>
-                <Legend htmlFor="phone">Téléphone</Legend>
+                <Legend htmlFor="phone">{t.phone}</Legend>
                 <div className="mt-2 flex gap-3">
                   <div className="relative shrink-0">
                     <select
-                      aria-label="Indicatif pays"
+                      aria-label={t.countryCodeAria}
                       value={data.countryCode}
                       onChange={(e) =>
                         update({ countryCode: e.target.value as CountryCode })
                       }
-                      className="h-12 w-[190px] appearance-none rounded-xl border border-line bg-white pl-4 pr-9 text-[14.5px] text-navy-900 outline-none transition-colors focus:border-navy-500"
+                      dir="ltr"
+                      className="h-12 w-[190px] appearance-none rounded-xl border border-line bg-white pl-4 pr-9 text-left text-[14.5px] text-navy-900 outline-none transition-colors focus:border-navy-500"
                     >
+                      {/*
+                       * Isolats directionnels (U+2066…U+2069) autour du code ISO
+                       * et de l'indicatif : sans eux, l'algorithme bidi mélange
+                       * ces segments latins avec le nom de pays arabe et produit
+                       * un rendu illisible, y compris avec `dir="ltr"` posé sur
+                       * le <select> — les <option> ne peuvent pas porter de
+                       * balises, seul l'isolat Unicode protège chaque segment.
+                       */}
                       {COUNTRIES.map((country) => (
                         <option key={country.code} value={country.code}>
-                          {country.code} {country.name} {country.dial}
+                          {"⁦" + country.code + "⁩"}{" "}
+                          {countries[country.code]}{" "}
+                          {"⁦" + country.dial + "⁩"}
                         </option>
                       ))}
                     </select>
+                    {/* Le sélecteur reste forcé en LTR (indicatifs
+                        téléphoniques) : le chevron suit son côté « fin »
+                        physique, pas le sens logique de la page. */}
                     <ChevronDownIcon className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-500" />
                   </div>
                   <input
@@ -141,7 +156,8 @@ export function ReportAccessDialog({
                     autoComplete="tel-national"
                     value={data.phone}
                     onChange={(e) => update({ phone: e.target.value })}
-                    className="h-12 w-full rounded-xl border border-line bg-white px-4 text-[14.5px] text-navy-900 outline-none transition-colors placeholder:text-ink-300 focus:border-navy-500"
+                    dir="ltr"
+                    className="h-12 w-full rounded-xl border border-line bg-white px-4 text-start text-[14.5px] text-navy-900 outline-none transition-colors placeholder:text-ink-300 focus:border-navy-500"
                   />
                 </div>
               </div>
@@ -154,14 +170,14 @@ export function ReportAccessDialog({
               onClick={onClose}
               className="inline-flex h-12 items-center justify-center rounded-xl border border-brand-blue-500 bg-white px-8 text-[15px] font-semibold text-brand-blue-500 transition-colors hover:bg-brand-blue-50"
             >
-              Annuler
+              {t.cancel}
             </button>
             <button
               type="submit"
               disabled={!complete}
               className="inline-flex h-12 items-center justify-center rounded-xl bg-brand-blue-500 px-6 text-[15px] font-semibold text-white transition-colors hover:bg-brand-blue-600 disabled:cursor-not-allowed disabled:bg-ink-300"
             >
-              Confirmer et générer le rapport
+              {t.confirm}
             </button>
           </footer>
         </form>

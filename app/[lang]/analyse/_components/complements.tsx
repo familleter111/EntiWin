@@ -14,7 +14,8 @@ import {
 } from "@/app/components/icons";
 import { ANSWER_LABEL, COMPLEMENTS, NO_ANSWER } from "../_lib/complements";
 import { ACCEPTED_EXTENSIONS, kindOf, THEME_LABEL } from "../_lib/documents";
-import { useLocale } from "@/lib/i18n/dictionary-provider";
+import { useLocale, useTunnel } from "@/lib/i18n/dictionary-provider";
+import { format } from "@/lib/i18n/interpolate";
 import { ThemeIcon } from "./analysis-ui";
 import { useWizard } from "./wizard-store";
 import type { Answer } from "./wizard-store";
@@ -33,6 +34,7 @@ export function ComplementQuestions({
   onNext: () => void;
 }) {
   const locale = useLocale();
+  const t = useTunnel().complementsQuestions;
   const { data, update } = useWizard();
   const answered = COMPLEMENTS.filter((c) => data.answers[c.id]).length;
   const complete = answered === COMPLEMENTS.length;
@@ -48,21 +50,19 @@ export function ComplementQuestions({
   return (
     <>
       <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-        Questions complémentaires
+        {t.title}
       </h1>
-      <p className="mt-1 text-[14px] text-ink-500">
-        Quelques réponses suffisent pour compléter l&apos;analyse.
-      </p>
+      <p className="mt-1 text-[14px] text-ink-500">{t.subtitle}</p>
 
       <p className="mt-2.5 inline-flex w-fit items-center gap-2 rounded-full bg-brand-blue-50 px-3.5 py-1.5 text-[13.5px] font-semibold text-brand-blue-600">
         <DottedCircleIcon className="h-4 w-4" />
-        {COMPLEMENTS.length} questions rapides
+        {format(t.quickQuestions, { n: COMPLEMENTS.length })}
       </p>
 
       <section className="mt-3 rounded-2xl border border-line bg-white p-4">
         <header className="flex items-center gap-4">
           <span className="text-[14px] font-semibold text-navy-900">
-            {answered} sur {COMPLEMENTS.length}
+            {format(t.answeredOf, { answered, total: COMPLEMENTS.length })}
           </span>
           <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
             <span
@@ -120,7 +120,7 @@ export function ComplementQuestions({
                   sa largeur min-content et fait deborder la colonne. */}
               <div className="grid min-w-0 gap-2">
                 <FilePicker
-                  label="Ajouter un fichier (optionnel)"
+                  label={t.addFile}
                   onPick={(name) => attach(complement.id, name)}
                 />
                 {data.answerFiles[complement.id] && (
@@ -142,8 +142,7 @@ export function ComplementQuestions({
 
         <p className="mt-3 flex items-center justify-center gap-2 text-[13.5px] text-ink-500">
           <InfoIcon className="h-4 w-4" />
-          Les fichiers sont facultatifs et servent uniquement à compléter vos
-          réponses.
+          {t.infoNote}
         </p>
       </section>
 
@@ -153,7 +152,7 @@ export function ComplementQuestions({
           onClick={onBack}
           className="inline-flex h-12 items-center justify-center rounded-xl border border-line bg-white px-8 text-[15px] font-semibold text-navy-900 transition-colors hover:border-navy-200 hover:bg-navy-50"
         >
-          Retour
+          {t.back}
         </button>
         <button
           type="button"
@@ -161,7 +160,7 @@ export function ComplementQuestions({
           disabled={!complete}
           className="ml-auto inline-flex h-12 items-center justify-center rounded-xl bg-navy-800 px-8 text-[15px] font-semibold text-white transition-colors hover:bg-navy-900 disabled:cursor-not-allowed disabled:bg-ink-300"
         >
-          Vérifier mes réponses
+          {t.verify}
         </button>
       </div>
     </>
@@ -180,6 +179,7 @@ export function ComplementReview({
   onSend: () => void;
 }) {
   const locale = useLocale();
+  const t = useTunnel().complementsReview;
   const { data, update } = useWizard();
 
   function addExtra(name: string, size: number) {
@@ -191,15 +191,13 @@ export function ComplementReview({
   return (
     <>
       <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-        Vérifiez vos compléments
+        {t.title}
       </h1>
-      <p className="mt-1 text-[14px] text-ink-500">
-        Relisez vos réponses avant de reprendre l&apos;analyse.
-      </p>
+      <p className="mt-1 text-[14px] text-ink-500">{t.subtitle}</p>
 
       <section className="mt-3 rounded-2xl border border-line bg-white p-4">
         <h2 className="font-display text-lg font-bold text-navy-900">
-          Résumé des réponses
+          {t.summaryTitle}
         </h2>
 
         <ul className="mt-2">
@@ -235,7 +233,7 @@ export function ComplementReview({
                 >
                   <FileTextIcon className="h-[18px] w-[18px] shrink-0" />
                   <span className="min-w-0 truncate" title={file}>
-                    {file ?? "Aucun fichier"}
+                    {file ?? t.noFile}
                   </span>
                 </span>
 
@@ -245,7 +243,7 @@ export function ComplementReview({
                   className="inline-flex items-center gap-2 justify-self-end text-[14px] font-semibold text-brand-blue-500 hover:underline"
                 >
                   <PencilIcon className="h-4 w-4" />
-                  Modifier
+                  {t.edit}
                 </button>
               </li>
             );
@@ -256,13 +254,13 @@ export function ComplementReview({
       <section className="mt-3 flex flex-wrap items-center gap-4 rounded-2xl border border-line bg-white p-4">
         <div>
           <h2 className="font-display text-[16px] font-bold text-navy-900">
-            Ajouter un document complémentaire
+            {t.addDocTitle}
           </h2>
-          <p className="text-[13.5px] text-ink-500">PDF, DOCX, XLSX</p>
+          <p className="text-[13.5px] text-ink-500">{t.addDocFormats}</p>
         </div>
         <div className="ml-auto grid min-w-0 max-w-full gap-2">
           <FilePicker
-            label="Ajouter un fichier"
+            label={t.addFile}
             onPick={(name, size) => addExtra(name, size)}
           />
           {data.extraFiles.map((file) => (
@@ -282,7 +280,7 @@ export function ComplementReview({
 
       <p className="mt-3 flex items-center gap-3 rounded-xl border border-brand-blue-100 bg-brand-blue-50/60 px-4 py-3 text-[14px] font-medium text-brand-blue-600">
         <InfoIcon className="h-5 w-5 shrink-0" />
-        Ces réponses et documents seront intégrés à l&apos;analyse en cours.
+        {t.infoNote}
       </p>
 
       <div className="mt-4 flex flex-col justify-center gap-4 rounded-2xl border border-line bg-white p-3 sm:flex-row lg:mt-auto">
@@ -291,8 +289,8 @@ export function ComplementReview({
           onClick={onBack}
           className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl border border-brand-blue-500 bg-white px-8 text-[15px] font-semibold text-brand-blue-500 transition-colors hover:bg-brand-blue-50"
         >
-          <ArrowLeftIcon className="h-[18px] w-[18px]" />
-          Retour aux questions
+          <ArrowLeftIcon className="h-[18px] w-[18px] rtl:-scale-x-100" />
+          {t.backToQuestions}
         </button>
         <button
           type="button"
@@ -300,7 +298,7 @@ export function ComplementReview({
           className="inline-flex h-12 items-center justify-center gap-2.5 rounded-xl bg-brand-blue-500 px-8 text-[15px] font-semibold text-white transition-colors hover:bg-brand-blue-600"
         >
           <RocketIcon className="h-5 w-5" />
-          Envoyer et reprendre l&apos;analyse
+          {t.sendAndResume}
         </button>
       </div>
     </>

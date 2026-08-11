@@ -10,6 +10,7 @@ import {
   DottedCircleIcon,
   FileTextIcon,
 } from "@/app/components/icons";
+import { useTunnel } from "@/lib/i18n/dictionary-provider";
 import type { DetectedTheme } from "../_lib/documents";
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -132,6 +133,8 @@ export type Stage = {
 
 /** Bandeau des phases internes de l'analyse. */
 export function StageBar({ stages }: { stages: Stage[] }) {
+  const t = useTunnel().stageBar;
+
   return (
     <section className="rounded-2xl border border-line bg-white p-4">
       <ol
@@ -183,19 +186,19 @@ export function StageBar({ stages }: { stages: Stage[] }) {
                     {state === "done" && (
                       <>
                         <CheckCircleSolidIcon className="h-4 w-4 text-green-500" />
-                        {stage.hint ?? "Terminé"}
+                        {stage.hint ?? t.done}
                       </>
                     )}
                     {state === "current" && (
                       <>
                         <DottedCircleIcon className="h-4 w-4 animate-spin [animation-duration:2.5s]" />
-                        {stage.hint ?? "En cours"}
+                        {stage.hint ?? t.inProgress}
                       </>
                     )}
                     {state === "todo" && (
                       <>
                         <ClockIcon className="h-4 w-4" />
-                        {stage.hint ?? "À venir"}
+                        {stage.hint ?? t.upcoming}
                       </>
                     )}
                   </p>
@@ -207,7 +210,7 @@ export function StageBar({ stages }: { stages: Stage[] }) {
                   aria-hidden="true"
                   className="hidden items-center px-2 text-ink-300 lg:flex"
                 >
-                  <ChevronRightIcon className="h-5 w-5" />
+                  <ChevronRightIcon className="h-5 w-5 rtl:-scale-x-100" />
                 </span>
               )}
             </li>

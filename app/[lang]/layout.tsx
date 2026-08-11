@@ -83,7 +83,11 @@ export default async function RootLayout({
       <body className="flex min-h-full flex-col bg-white">
         {/* Les composants client (navigation, tunnel) lisent le dictionnaire
             ici ; les composants serveur appellent `getDictionary()` eux-mêmes. */}
-        <DictionaryProvider locale={locale} common={dict.common}>
+        <DictionaryProvider
+          locale={locale}
+          common={dict.common}
+          tunnel={dict.tunnel}
+        >
           {children}
         </DictionaryProvider>
       </body>

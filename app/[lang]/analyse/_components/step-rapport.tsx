@@ -23,7 +23,11 @@ import {
   XCircleIcon,
 } from "@/app/components/icons";
 import { DEMO_FILES, THEME_LABEL, type ThemeId } from "../_lib/documents";
-import { PRIORITY_LABEL, topRecommendations } from "../_lib/recommendations";
+import {
+  LEVEL_LABEL,
+  PRIORITY_LABEL,
+  topRecommendations,
+} from "../_lib/recommendations";
 import {
   COVERAGE,
   REQUIREMENTS,
@@ -35,25 +39,16 @@ import {
 } from "../_lib/requirements";
 import { Density } from "./density";
 import { ReportAccessDialog } from "./report-access-dialog";
-import { useLocale } from "@/lib/i18n/dictionary-provider";
+import { localePath, type Locale } from "@/lib/i18n/config";
+import { useLocale, useTunnel } from "@/lib/i18n/dictionary-provider";
+import { formatDate } from "@/lib/i18n/format";
+import { format, plural } from "@/lib/i18n/interpolate";
+import type { Dictionary } from "@/lib/i18n/dictionaries/fr";
 import { useWizard } from "./wizard-store";
 
 const PAGE_SIZE = 10;
 
 const THEMES: ThemeId[] = ["deviations", "documentaire"];
-
-/** Une phrase de synthèse par thème, calée sur le niveau de couverture. */
-const THEME_SUMMARY: Record<ThemeId, { title: string; detail: string }> = {
-  deviations: {
-    title: "Couverture suffisante avec des écarts",
-    detail:
-      "Des actions correctives sont requises pour renforcer le suivi et l'efficacité.",
-  },
-  documentaire: {
-    title: "Bonne couverture globale",
-    detail: "Documentation bien structurée avec quelques éléments à compléter.",
-  },
-};
 
 const STATUS_DOT: Record<ReqStatus, string> = {
   couverte: "bg-green-500",
@@ -96,6 +91,7 @@ export function StepRapport() {
 /* ------------------------------------------------------------------ */
 
 function ReportOverview({ onGenerate }: { onGenerate: () => void }) {
+  const { overview: t, tiles: tileLabels } = useTunnel().report;
   const stats = requirementStats();
 
   return (
@@ -104,7 +100,7 @@ function ReportOverview({ onGenerate }: { onGenerate: () => void }) {
     <div className="mx-auto flex min-h-0 w-full max-w-[1500px] flex-1 flex-col px-6 py-4 lg:[justify-content:safe_center] xl:px-10">
       <div className="flex flex-wrap items-center gap-4">
         <h1 className="font-display text-[clamp(1.5rem,1.9vw,1.85rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-          Rapport d&apos;analyse
+          {t.title}
         </h1>
         <button
           type="button"
@@ -112,7 +108,7 @@ function ReportOverview({ onGenerate }: { onGenerate: () => void }) {
           className="ml-auto inline-flex h-12 items-center gap-2.5 rounded-xl bg-brand-blue-500 px-6 text-[15px] font-semibold text-white transition-colors hover:bg-brand-blue-600"
         >
           <FileTextIcon className="h-5 w-5" />
-          Générer tout le rapport
+          {t.generate}
         </button>
       </div>
 
@@ -120,19 +116,19 @@ function ReportOverview({ onGenerate }: { onGenerate: () => void }) {
       <section className="mt-3 rounded-2xl border border-brand-blue-100 bg-gradient-to-b from-brand-blue-50/70 to-white p-5">
         <header className="flex flex-wrap items-center gap-4">
           <h2 className="font-display text-[22px] font-extrabold text-navy-900">
-            Score global de conformité
+            {t.globalScoreTitle}
           </h2>
           <span className="ml-auto inline-flex items-center gap-2 rounded-xl border border-line bg-white px-4 py-2 text-[13.5px] font-semibold text-navy-900">
             <EyeIcon className="h-[18px] w-[18px] text-brand-blue-500" />
-            Vue d&apos;ensemble
+            {t.overview}
           </span>
         </header>
 
         <div className="mt-3 flex flex-wrap items-center gap-6">
-          <Donut score={stats.score} size={168} caption="Score global" />
+          <Donut score={stats.score} size={168} caption={t.globalScoreTitle} />
           <span className="hidden h-24 w-px bg-line lg:block" />
           <ul className="flex flex-1 flex-wrap justify-around gap-4">
-            {tiles(stats).map((tile) => (
+            {tiles(stats, tileLabels).map((tile) => (
               <StatTile key={tile.label} {...tile} />
             ))}
           </ul>
@@ -141,7 +137,7 @@ function ReportOverview({ onGenerate }: { onGenerate: () => void }) {
 
       {/* ---------------- Scores par thème ---------------- */}
       <h2 className="mt-4 font-display text-[16px] font-bold text-navy-900">
-        Scores par thème
+        {t.scoresByTheme}
       </h2>
       <div className="mt-2 grid gap-4 lg:grid-cols-2">
         {THEMES.map((theme) => (
@@ -151,8 +147,7 @@ function ReportOverview({ onGenerate }: { onGenerate: () => void }) {
 
       <p className="mt-4 flex items-center gap-3 rounded-xl border border-brand-blue-100 bg-brand-blue-50/60 px-4 py-3 text-[14px] font-medium text-brand-blue-600">
         <InfoIcon className="h-5 w-5 shrink-0" />
-        Générez le rapport complet pour consulter les analyses, preuves et
-        recommandations IA.
+        {t.ctaHint}
       </p>
     </div>
   );
@@ -160,6 +155,7 @@ function ReportOverview({ onGenerate }: { onGenerate: () => void }) {
 
 function ThemeScoreCard({ theme }: { theme: ThemeId }) {
   const locale = useLocale();
+  const { tiles: tileLabels } = useTunnel().report;
   const stats = themeStats(theme);
 
   return (
@@ -171,7 +167,7 @@ function ThemeScoreCard({ theme }: { theme: ThemeId }) {
         <Donut score={stats.score} size={104} />
         <span className="hidden h-16 w-px bg-line sm:block" />
         <ul className="flex flex-1 flex-wrap justify-around gap-3">
-          {tiles(stats).map((tile) => (
+          {tiles(stats, tileLabels).map((tile) => (
             <StatTile key={tile.label} {...tile} compact />
           ))}
         </ul>
@@ -186,6 +182,8 @@ function ThemeScoreCard({ theme }: { theme: ThemeId }) {
 
 function FullReport() {
   const locale = useLocale();
+  const { report } = useTunnel();
+  const t = report.full;
   const { data } = useWizard();
   const files = data.files.length > 0 ? data.files : DEMO_FILES;
 
@@ -240,11 +238,11 @@ function FullReport() {
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="font-display text-[clamp(1.4rem,1.8vw,1.75rem)] font-extrabold tracking-[-0.02em] text-navy-900">
-              Rapport complet d&apos;analyse
+              {t.title}
             </h1>
             <span className="inline-flex items-center gap-1.5 rounded-md bg-green-50 px-2.5 py-1 text-[12.5px] font-semibold text-green-600">
               <CheckCircleSolidIcon className="h-3.5 w-3.5 text-green-500" />
-              Rapport généré
+              {t.generatedBadge}
             </span>
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-3 text-[13px] text-ink-500">
@@ -257,24 +255,28 @@ function FullReport() {
                 {files[0].name}
               </span>
             </span>
-            <GeneratedAt at={data.generatedAt || data.completedAt} />
+            <GeneratedAt
+              at={data.generatedAt || data.completedAt}
+              locale={locale}
+              t={report}
+            />
           </div>
         </div>
 
         <Link
-          href="/rapport"
+          href={localePath(locale, "/rapport")}
           prefetch
           className="ml-auto inline-flex h-11 items-center gap-2.5 rounded-xl bg-brand-blue-500 px-5 text-[14.5px] font-semibold text-white transition-colors hover:bg-brand-blue-600"
         >
           <DownloadIcon className="h-[18px] w-[18px]" />
-          Télécharger le PDF
+          {t.downloadPdf}
         </Link>
       </div>
 
       {/* ---------------- Onglets ---------------- */}
       <div className="mt-2.5 flex flex-wrap gap-1 border-b border-line">
         <Tab active={tab === "global"} onClick={() => selectTab("global")}>
-          Vue globale
+          {t.globalTab}
         </Tab>
         {THEMES.map((theme) => (
           <Tab
@@ -286,10 +288,7 @@ function FullReport() {
           </Tab>
         ))}
       </div>
-      <p className="mt-2 text-[13px] text-ink-500">
-        Sélectionnez un thème pour consulter son analyse, ses preuves et ses
-        recommandations.
-      </p>
+      <p className="mt-2 text-[13px] text-ink-500">{t.tabsHint}</p>
 
       {/* ---------------- Indicateurs ---------------- */}
       <div className="mt-2.5 grid gap-3 lg:grid-cols-[minmax(0,390px)_1fr]">
@@ -298,23 +297,24 @@ function FullReport() {
           <div className="min-w-0">
             <p className="font-display text-[15px] font-bold text-navy-900">
               {tab === "global"
-                ? "Score global de conformité"
-                : `Score ${THEME_LABEL[tab]}`}
+                ? t.scoreGlobal
+                : format(t.scoreOfTheme, { theme: THEME_LABEL[tab][locale] })}
             </p>
             <p className="mt-0.5 text-[12.5px] text-ink-500">
-              Couverture pondérée des exigences
+              {t.weightedCoverage}
             </p>
             <p className="mt-1 text-[11.5px] leading-4 text-ink-500">
-              <Bullet className="bg-transparent ring-1 ring-ink-300" /> Couvert
-              = 100 % <Bullet className="bg-brand-blue-500" /> Partiel = 50 %
+              <Bullet className="bg-transparent ring-1 ring-ink-300" />{" "}
+              {t.legendCovered} <Bullet className="bg-brand-blue-500" />{" "}
+              {t.legendPartial}
               <br />
-              <Bullet className="bg-danger" /> Non identifié = 0 %
+              <Bullet className="bg-danger" /> {t.legendNotIdentified}
             </p>
           </div>
         </section>
 
         <ul className="grid divide-line rounded-2xl border border-line bg-white sm:grid-cols-3 lg:grid-cols-5 lg:divide-x">
-          {tiles(stats).map((tile) => (
+          {tiles(stats, report.tiles).map((tile) => (
             <StatTile key={tile.label} {...tile} row />
           ))}
         </ul>
@@ -333,33 +333,37 @@ function FullReport() {
           {/* Analyse détaillée */}
           <section className="flex min-h-0 flex-1 flex-col rounded-2xl border border-line bg-white p-3">
             <h2 className="font-display text-[15px] font-bold text-navy-900">
-              Analyse détaillée
+              {t.detailedAnalysis}
             </h2>
 
             <label className="relative mt-2 block">
-              <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-300" />
+              <SearchIcon className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-300" />
               <input
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
                   setPage(0);
                 }}
-                placeholder="Rechercher une exigence…"
-                aria-label="Rechercher une exigence"
-                className="h-9 w-full max-w-[420px] rounded-lg border border-line bg-white pl-9 pr-3 text-[13.5px] text-navy-900 outline-none transition-colors placeholder:text-ink-300 focus:border-navy-500"
+                placeholder={t.searchPlaceholder}
+                aria-label={t.searchAria}
+                className="h-9 w-full max-w-[420px] rounded-lg border border-line bg-white ps-9 pe-3 text-[13.5px] text-navy-900 outline-none transition-colors placeholder:text-ink-300 focus:border-navy-500"
               />
             </label>
 
             <div className="mt-2 min-h-0 flex-1 overflow-y-auto">
-              <table className="w-full border-collapse text-left">
+              <table className="w-full border-collapse text-start">
                 <thead className="sticky top-0 bg-white">
                   <tr className="border-b border-line text-[12px] text-ink-500">
-                    <th className="w-8 pb-1 font-medium">#</th>
-                    <th className="pb-1 font-medium">Exigence</th>
-                    <th className="w-[170px] pb-1 font-medium">Statut</th>
-                    <th className="w-[150px] pb-1 font-medium">Couverture</th>
-                    <th className="w-[70px] pb-1 text-right font-medium">
-                      Confiance
+                    <th className="w-8 pb-1 font-medium">{t.colId}</th>
+                    <th className="pb-1 font-medium">{t.colRequirement}</th>
+                    <th className="w-[170px] pb-1 font-medium">
+                      {t.colStatus}
+                    </th>
+                    <th className="w-[150px] pb-1 font-medium">
+                      {t.colCoverage}
+                    </th>
+                    <th className="w-[70px] pb-1 text-end font-medium">
+                      {t.colConfidence}
                     </th>
                   </tr>
                 </thead>
@@ -379,16 +383,16 @@ function FullReport() {
                         <td
                           className={`py-1 text-[12.5px] ${
                             active
-                              ? "border-l-2 border-brand-blue-500 pl-1.5 font-semibold text-brand-blue-600"
-                              : "pl-2 text-ink-500"
+                              ? "border-s-2 border-brand-blue-500 ps-1.5 font-semibold text-brand-blue-600"
+                              : "ps-2 text-ink-500"
                           }`}
                         >
                           {requirement.id}
                         </td>
-                        <td className="py-1 pr-3 text-[13px] leading-[1.35] text-navy-900">
+                        <td className="py-1 pe-3 text-[13px] leading-[1.35] text-navy-900">
                           {requirement.label[locale]}
                         </td>
-                        <td className="py-1 pr-3">
+                        <td className="py-1 pe-3">
                           <span
                             className={`flex items-center gap-2 text-[12.5px] ${STATUS_TEXT[requirement.status]}`}
                           >
@@ -398,7 +402,7 @@ function FullReport() {
                             {STATUS_LABEL[requirement.status][locale]}
                           </span>
                         </td>
-                        <td className="py-1 pr-3">
+                        <td className="py-1 pe-3">
                           <span className="flex items-center gap-2">
                             <span className="w-11 shrink-0 whitespace-nowrap text-[12.5px] font-semibold text-navy-900">
                               {coverage} %
@@ -417,7 +421,7 @@ function FullReport() {
                             </span>
                           </span>
                         </td>
-                        <td className="py-1 text-right text-[12.5px] font-semibold text-navy-900">
+                        <td className="py-1 text-end text-[12.5px] font-semibold text-navy-900">
                           {requirement.confidence} %
                         </td>
                       </tr>
@@ -430,7 +434,7 @@ function FullReport() {
                         colSpan={5}
                         className="py-8 text-center text-[13.5px] text-ink-500"
                       >
-                        Aucune exigence ne correspond à cette recherche.
+                        {t.noResults}
                       </td>
                     </tr>
                   )}
@@ -441,20 +445,21 @@ function FullReport() {
             <footer className="mt-1.5 flex flex-wrap items-center gap-3 border-t border-line pt-1.5">
               <p className="text-[12.5px] text-ink-500">
                 {filtered.length === 0
-                  ? "Aucune exigence"
-                  : `Affichage ${current * PAGE_SIZE + 1} à ${Math.min(
-                      (current + 1) * PAGE_SIZE,
-                      filtered.length,
-                    )} sur ${filtered.length} exigences`}
+                  ? t.noRequirements
+                  : format(t.showingRange, {
+                      from: current * PAGE_SIZE + 1,
+                      to: Math.min((current + 1) * PAGE_SIZE, filtered.length),
+                      total: filtered.length,
+                    })}
               </p>
 
               <div className="ml-auto flex items-center gap-1.5">
                 <PagerButton
-                  label="Page précédente"
+                  label={t.prevPage}
                   disabled={current === 0}
                   onClick={() => setPage(current - 1)}
                 >
-                  <ChevronLeftIcon className="h-4 w-4" />
+                  <ChevronLeftIcon className="h-4 w-4 rtl:-scale-x-100" />
                 </PagerButton>
 
                 {Array.from({ length: pageCount }, (_, i) => (
@@ -474,11 +479,11 @@ function FullReport() {
                 ))}
 
                 <PagerButton
-                  label="Page suivante"
+                  label={t.nextPage}
                   disabled={current >= pageCount - 1}
                   onClick={() => setPage(current + 1)}
                 >
-                  <ChevronRightIcon className="h-4 w-4" />
+                  <ChevronRightIcon className="h-4 w-4 rtl:-scale-x-100" />
                 </PagerButton>
               </div>
             </footer>
@@ -493,7 +498,7 @@ function FullReport() {
                 <span className="text-[12px] font-bold">{selected.id}</span>
               }
               tone="blue"
-              title="Preuve dans le document"
+              title={t.evidenceInDoc}
               connector
             >
               {selected.evidence ? (
@@ -506,16 +511,14 @@ function FullReport() {
                   </p>
                 </>
               ) : (
-                <p className="leading-5 text-ink-500">
-                  Aucune preuve détectée dans les documents fournis.
-                </p>
+                <p className="leading-5 text-ink-500">{t.noEvidenceDetail}</p>
               )}
             </DetailBlock>
 
             <DetailBlock
               icon={<AlertTriangleIcon className="h-[18px] w-[18px]" />}
               tone="warn"
-              title="Éléments manquants"
+              title={t.missingElements}
               connector
             >
               {selected.missing.length > 0 ? (
@@ -530,16 +533,14 @@ function FullReport() {
                   ))}
                 </ul>
               ) : (
-                <p className="leading-5 text-ink-700">
-                  Aucun élément manquant relevé.
-                </p>
+                <p className="leading-5 text-ink-700">{t.noMissingDetail}</p>
               )}
             </DetailBlock>
 
             <DetailBlock
               icon={<LightbulbIcon className="h-[18px] w-[18px]" />}
               tone="green"
-              title="Recommandation IA"
+              title={t.aiRecommendation}
             >
               <p className="leading-5 text-ink-700">
                 {selected.recommendation[locale]}
@@ -552,7 +553,7 @@ function FullReport() {
               <ShieldCheckIcon className="h-[18px] w-[18px]" />
             </span>
             <p className="text-[13.5px] font-semibold text-navy-900">
-              Niveau de confiance : {selected.confidence} %
+              {format(t.confidenceLevel, { n: selected.confidence })}
             </p>
           </div>
         </section>
@@ -561,7 +562,7 @@ function FullReport() {
       {/* ---------------- Recommandations ---------------- */}
       <section className="mt-3 shrink-0">
         <h2 className="font-display text-[15px] font-bold text-navy-900">
-          Recommandations IA prioritaires
+          {t.recommendationsTitle}
         </h2>
         <ul className="mt-2 grid gap-3 lg:grid-cols-3">
           {topRecommendations(locale, 3, tab === "global" ? undefined : tab).map(
@@ -588,15 +589,15 @@ function FullReport() {
                 </p>
                 <p className="mt-1.5 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-ink-500">
                   <span>
-                    Impact attendu :{" "}
+                    {t.impactLabel}{" "}
                     <span className="font-semibold text-navy-900">
-                      {reco.impact}
+                      {LEVEL_LABEL[reco.impact][locale]}
                     </span>
                   </span>
                   <span>
-                    Effort :{" "}
+                    {t.effortLabel}{" "}
                     <span className="font-semibold text-navy-900">
-                      {reco.effort}
+                      {LEVEL_LABEL[reco.effort][locale]}
                     </span>
                   </span>
                 </p>
@@ -612,7 +613,7 @@ function FullReport() {
 function ThemeSummary({ theme }: { theme: ThemeId }) {
   const locale = useLocale();
   const stats = themeStats(theme);
-  const summary = THEME_SUMMARY[theme];
+  const summary = useTunnel().report.themeSummary[theme];
 
   return (
     <section className="flex items-start gap-3 rounded-2xl border border-line bg-white p-3">
@@ -649,37 +650,37 @@ function requirementOf(theme: ThemeId) {
   return REQUIREMENTS.find((r) => r.theme === theme) ?? REQUIREMENTS[0];
 }
 
-function tiles(stats: Stats) {
+function tiles(stats: Stats, t: Dictionary["tunnel"]["report"]["tiles"]) {
   return [
     {
       icon: <ClipboardCheckIcon className="h-5 w-5" />,
       tone: "navy" as const,
       value: stats.total,
-      label: "Exigences",
+      label: t.requirements,
     },
     {
       icon: <CheckCircleIcon className="h-5 w-5" />,
       tone: "green" as const,
       value: stats.couvertes,
-      label: "Couvertes",
+      label: t.covered,
     },
     {
       icon: <PieIcon className="h-5 w-5" />,
       tone: "blue" as const,
       value: stats.partielles,
-      label: "Partielles",
+      label: t.partial,
     },
     {
       icon: <XCircleIcon className="h-5 w-5" />,
       tone: "danger" as const,
       value: stats.nonIdentifiees,
-      label: stats.nonIdentifiees > 1 ? "Non identifiées" : "Non identifiée",
+      label: plural(stats.nonIdentifiees, t.notIdentified),
     },
     {
       icon: <AlertTriangleIcon className="h-5 w-5" />,
       tone: "blue" as const,
       value: stats.critiques,
-      label: stats.critiques > 1 ? "Points critiques" : "Point critique",
+      label: plural(stats.critiques, t.criticalPoints),
     },
   ];
 }
@@ -704,13 +705,14 @@ function Donut({
 }) {
   const circumference = 2 * Math.PI * 44;
   const big = size >= 140;
+  const t = useTunnel().report;
 
   return (
     <div
       className="relative shrink-0"
       style={{ height: size, width: size }}
       role="img"
-      aria-label={`Score de conformité : ${score} %`}
+      aria-label={format(t.scoreAriaLabel, { score })}
     >
       <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
         <circle
@@ -924,23 +926,23 @@ function DetailBlock({
 }
 
 /** Horodatage — rendu seulement après hydratation du store. */
-function GeneratedAt({ at }: { at: number }) {
+function GeneratedAt({
+  at,
+  locale,
+  t,
+}: {
+  at: number;
+  locale: Locale;
+  t: Dictionary["tunnel"]["report"];
+}) {
   if (!at) return null;
 
-  const date = new Date(at);
-  const jour = new Intl.DateTimeFormat("fr-FR", {
+  const day = formatDate(at, locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
-  }).format(date);
-  const heure = new Intl.DateTimeFormat("fr-FR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+  });
+  const time = formatDate(at, locale, { hour: "2-digit", minute: "2-digit" });
 
-  return (
-    <span>
-      {jour} à {heure}
-    </span>
-  );
+  return <span>{format(t.generatedAt, { day, time })}</span>;
 }
