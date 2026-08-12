@@ -30,14 +30,16 @@ COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
+COPY docker/startup.sh /app/startup.sh
 
 # nginx normally runs its master process as root to bind port 80 and to let
 # workers drop privileges; here the whole container runs as the unprivileged
 # `node` user instead, so nginx needs its working directories to already be
 # owned by that user.
 RUN mkdir -p /var/lib/nginx/tmp /var/log/nginx /run/nginx && \
-    chown -R node:node /var/lib/nginx /var/log/nginx /run/nginx /etc/nginx
+    chown -R node:node /var/lib/nginx /var/log/nginx /run/nginx /etc/nginx && \
+    chmod +x /app/startup.sh
 
 USER node
 EXPOSE 8080
-ENTRYPOINT ["supervisord", "-c", "/etc/supervisord.conf"]
+ENTRYPOINT ["/app/startup.sh"]
