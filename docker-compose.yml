@@ -1,0 +1,35 @@
+# Local-only: builds the same image DEPLOY.md pushes to Azure, and pairs it
+# with a MySQL container so the container/nginx/env-var wiring can be tested
+# before touching Azure. Production MySQL is Azure Database for MySQL
+# Flexible Server, not this container.
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: entiwin
+      MYSQL_USER: entiwin
+      MYSQL_PASSWORD: entiwin
+      MYSQL_ROOT_PASSWORD: entiwin_root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:
